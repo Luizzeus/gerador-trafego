@@ -117,7 +117,7 @@ export default function PublicLp({ params }: { params: { subdomain: string } }) 
       }
 
       // Redireciona o visitante para o WhatsApp do profissional após 1.5s
-      const message = encodeURIComponent(`Olá, vim através da sua página e gostaria de mais informações.`);
+      const message = encodeURIComponent(`Olá, vi sua página e gostaria de mais informações.`);
       setTimeout(() => {
         window.location.href = `https://wa.me/${profile.whatsappNumber}?text=${message}`;
       }, 1500);
