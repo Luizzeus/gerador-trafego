@@ -42,9 +42,18 @@ Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e imp
 
 2. **Gestão de Agenda de Consultas & Google Calendar Sync**:
    - Nova página no painel administrativo (**Agenda de Consultas**) com visualização organizada por abas (Pendentes, Confirmados, Cancelados).
-   - Módulo de sincronização via fluxo de consentimento OAuth2 simulado para o Google Calendar, armazenando o status de conexão de forma resiliente.
+   - Módulo de sincronização via fluxo de consentimento OAuth2 simulado para o Google Calendar, armazenando o status de conexão de forma resiliente na tabela `AdsCredential` (com `provider: 'google_calendar'`).
    - Geração automática e dinâmica de links exclusivos do **Google Meet** (`https://meet.google.com/xxx-xxxx-xxx`) na confirmação de consultas pendentes se a agenda estiver vinculada.
    - Fluxo de cancelamento/declínio que invalida e limpa os links gerados.
+
+3. **Arquitetura & Estrutura de Arquivos da Fase 3**:
+   - **Backend (NestJS):**
+     * [appointment.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.service.ts) - Lógica de agendamento, controle de status, geração de link de reuniões e sincronização do Google Calendar.
+     * [appointment.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.controller.ts) - Endpoints públicos e protegidos (JWT) de consulta, status, criação e credenciais.
+     * [appointment.module.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.module.ts) - Definição do módulo de agenda injetando dependências do Prisma e Leads.
+   - **Frontend (Next.js):**
+     * [agenda/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/agenda/page.tsx) - Painel administrativo da agenda e fluxo simulado do Google OAuth2.
+     * [lp/[subdomain]/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/lp/%5Bsubdomain%5D/page.tsx) - Integração com o formulário de pré-agendamento e captação de leads.
 
 ---
 
