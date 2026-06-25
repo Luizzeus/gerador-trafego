@@ -1,0 +1,110 @@
+### 1. Criar um Novo Usuário (Cadastro)
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "email": "ana.souza@email.com",
+  "password": "senhaSegura123",
+  "name": "Ana Souza",
+  "role": "professional"
+}
+
+###
+
+### 2. Efetuar Login (Retorna o JWT)
+# Copie o valor do campo "access_token" retornado no corpo da resposta
+# e cole-o na variável @token na linha abaixo.
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "ana.souza@email.com",
+  "password": "senhaSegura123"
+}
+
+###
+
+@token = SUBSTITUA_PELO_TOKEN_RETORNADO_NO_LOGIN
+
+### 3. Salvar Perfil Profissional (Autenticado)
+POST http://localhost:3000/profiles
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "niche": "psychologist",
+  "fullName": "Dra. Ana Souza",
+  "registerNumber": "CRP 06/12345",
+  "registerState": "SP",
+  "bio": "Psicóloga clínica especialista em terapia cognitivo-comportamental para ansiedade.",
+  "addressCity": "São Paulo",
+  "addressState": "SP",
+  "addressZipcode": "01001-000",
+  "whatsappNumber": "5511999999999"
+}
+
+###
+
+### 4. Obter Meu Perfil (Autenticado)
+GET http://localhost:3000/profiles/me
+Authorization: Bearer {{token}}
+
+###
+
+### 5. Criar/Salvar Landing Page (Autenticado)
+# Copie o ID da Landing Page retornado para usar no teste de captura de lead abaixo.
+POST http://localhost:3000/landing-pages
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "title": "Terapia de Ansiedade com Dra. Ana",
+  "subdomain": "ana-terapeuta",
+  "status": "published",
+  "contentJson": "{\"blocks\": [{\"type\": \"hero\", \"title\": \"Tratamento de Ansiedade\"}]}"
+}
+
+###
+
+### 6. Listar Minhas Landing Pages (Autenticado)
+GET http://localhost:3000/landing-pages/me
+Authorization: Bearer {{token}}
+
+###
+
+@landingPageId = SUBSTITUA_PELO_ID_DA_LANDING_PAGE_GERADA
+
+### 7. Capturar um Lead na LP (Público - Simula Visitante)
+POST http://localhost:3000/leads
+Content-Type: application/json
+
+{
+  "landingPageId": "{{landingPageId}}",
+  "name": "Carlos Silva",
+  "email": "carlos.silva@email.com",
+  "phone": "5511988888888",
+  "serviceCategoryId": 1,
+  "trafficSource": "Google Ads",
+  "consentText": "Eu aceito receber contatos profissionais sobre terapia.",
+  "acceptedConsent": true
+}
+
+###
+
+### 8. Listar Leads no CRM do Profissional (Autenticado)
+# Copie o ID do lead retornado para testar a alteração de status
+GET http://localhost:3000/leads/crm
+Authorization: Bearer {{token}}
+
+###
+
+@leadId = SUBSTITUA_PELO_ID_DO_LEAD_RETORNADO
+
+### 9. Mudar Status do Lead no CRM (Autenticado - Ex: Mover para 'in_contact')
+PATCH http://localhost:3000/leads/crm/{{leadId}}/status
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "status": "in_contact"
+}

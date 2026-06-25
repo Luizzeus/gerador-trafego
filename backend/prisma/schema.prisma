@@ -1,0 +1,190 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                   String               @id @default(uuid())
+  email                String               @unique
+  passwordHash         String
+  role                 String               // "admin" | "professional" | "company_member"
+  status               String               // "pending" | "active" | "suspended"
+  createdAt            DateTime             @default(now())
+  updatedAt            DateTime             @updatedAt
+  professionalProfiles ProfessionalProfile[]
+  companies            Company[]
+  campaigns            Campaign[]
+  payments             Payment[]
+  auditLogs            AuditLog[]
+}
+
+model ProfessionalProfile {
+  id             String           @id @default(uuid())
+  userId         String
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  niche          String           // "caregiver" | "psychologist"
+  fullName       String
+  registerNumber String           // CRP ou COREN autodeclarado
+  registerState  String           // Ex: SP, RJ
+  bio            String?
+  profileImageUrl String?
+  addressCity    String
+  addressState   String
+  addressZipcode String
+  whatsappNumber String
+  isVerified     Boolean          @default(false)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  landingPages   LandingPage[]
+  appointments   Appointment[]
+}
+
+model Company {
+  id           String        @id @default(uuid())
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  cnpj         String        @unique
+  description  String?
+  logoUrl      String?
+  addressCity  String
+  addressState String
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  landingPages LandingPage[]
+}
+
+model ServiceCategory {
+  id          Int      @id @default(autoincrement())
+  niche       String   // "caregiver" | "psychologist"
+  name        String   // Ex: Terapia Infantil, Cuidador Noturno
+  description String?
+  leads       Lead[]
+}
+
+model LandingPage {
+  id                    String               @id @default(uuid())
+  professionalProfileId String?
+  professionalProfile   ProfessionalProfile? @relation(fields: [professionalProfileId], references: [id], onDelete: Cascade)
+  companyId             String?
+  company               Company?             @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  title                 String
+  subdomain             String               @unique
+  customDomain          String?              @unique
+  status                String               // "draft" | "published"
+  contentJson           String               // Armazena a estrutura de blocos da página como JSON String
+  pixelMetaId           String?
+  pixelGoogleId         String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  campaigns             Campaign[]
+  leads                 Lead[]
+}
+
+model Campaign {
+  id                        String      @id @default(uuid())
+  userId                    String
+  user                      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  landingPageId             String
+  landingPage               LandingPage @relation(fields: [landingPageId], references: [id], onDelete: Cascade)
+  name                      String
+  channel                   String      // "google_ads" | "meta_ads" | "organic_social"
+  adsAccountCredentialsId   String?
+  budget                    Float
+  targetKeywords            String?     // Lista separada por vírgulas ou texto livre
+  status                    String      // "draft" | "active" | "paused" | "ended"
+  createdAt                 DateTime    @default(now())
+  updatedAt                 DateTime    @updatedAt
+}
+
+model Lead {
+  id                String          @id @default(uuid())
+  landingPageId     String
+  landingPage       LandingPage     @relation(fields: [landingPageId], references: [id], onDelete: Cascade)
+  name              String
+  email             String?
+  phone             String
+  serviceCategoryId Int
+  serviceCategory   ServiceCategory @relation(fields: [serviceCategoryId], references: [id])
+  status            String          // "new" | "in_contact" | "scheduled" | "converted" | "lost"
+  trafficSource     String          // "Google Ads" | "Meta Ads" | "Organic Search" etc.
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  consentLogs       ConsentLog[]
+  appointments      Appointment[]
+}
+
+model Appointment {
+  id                    String              @id @default(uuid())
+  professionalProfileId String
+  professionalProfile   ProfessionalProfile @relation(fields: [professionalProfileId], references: [id], onDelete: Cascade)
+  leadId                String
+  lead                  Lead                @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  scheduledTime         DateTime
+  durationMinutes       Int
+  status                String              // "pending" | "confirmed" | "cancelled" | "completed"
+  meetingLink           String?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+}
+
+model SubscriptionPlan {
+  id           Int       @id @default(autoincrement())
+  name         String
+  priceMonthly Float
+  featuresJson String    // Armazena as permissões do plano em formato JSON String
+  isActive     Boolean   @default(true)
+  payments     Payment[]
+}
+
+model Payment {
+  id                 String           @id @default(uuid())
+  userId             String
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionPlanId Int
+  subscriptionPlan   SubscriptionPlan @relation(fields: [subscriptionPlanId], references: [id])
+  gatewayInvoiceId   String
+  pixCopyPaste       String?
+  pixQrCodeUrl       String?
+  invoicePdfUrl      String?
+  amount             Float
+  status             String           // "pending" | "paid" | "failed" | "refunded"
+  paymentMethod      String           // "credit_card" | "pix"
+  createdAt          DateTime         @default(now())
+}
+
+model ConsentLog {
+  id          String   @id @default(uuid())
+  leadId      String
+  lead        Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  ipAddress   String
+  userAgent   String
+  consentText String
+  consentHash String
+  acceptedAt  DateTime @default(now())
+}
+
+model AuditLog {
+  id        Int      @id @default(autoincrement())
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action    String   // Ex: EDIT_LANDING_PAGE
+  ipAddress String
+  details   String   // JSON String
+  createdAt DateTime @default(now())
+}
+
+model ContentSuggestion {
+  id              String   @id @default(uuid())
+  niche           String   // "caregiver" | "psychologist"
+  format          String   // "instagram_post" | "blog_article" | "video_script"
+  theme           String
+  generatedTitle  String
+  generatedBody   String
+  ethicalApproved Boolean  @default(true)
+  createdAt       DateTime @default(now())
+}
