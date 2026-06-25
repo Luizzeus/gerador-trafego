@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { ArrowRight, Activity, Users, ShieldCheck, Zap, HeartHandshake, Eye, MessageSquare, Target } from 'lucide-react';
 
 export default function Home() {
@@ -28,12 +29,12 @@ export default function Home() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <button className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">
+            <Link href="/login" className="text-sm font-semibold text-slate-300 hover:text-white transition-colors">
               Entrar
-            </button>
-            <button className="bg-clinical-500 hover:bg-clinical-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-clinical-500/30 hover:shadow-clinical-500/50 hover:translate-y-[-1px] active:translate-y-[1px] transition-all duration-200">
+            </Link>
+            <Link href="/register" className="bg-clinical-500 hover:bg-clinical-600 text-white text-sm font-semibold px-5 py-2.5 rounded-xl shadow-lg shadow-clinical-500/30 hover:shadow-clinical-500/50 hover:translate-y-[-1px] active:translate-y-[1px] transition-all duration-200 text-center">
               Começar Agora
-            </button>
+            </Link>
           </div>
         </div>
       </header>
@@ -60,13 +61,13 @@ export default function Home() {
           </p>
 
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-4">
-            <button className="bg-gradient-to-r from-clinical-500 to-indigo-600 hover:from-clinical-600 hover:to-indigo-700 text-white font-bold px-8 py-4 rounded-2xl shadow-xl shadow-clinical-500/25 hover:shadow-clinical-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group">
+            <Link href="/register" className="bg-gradient-to-r from-clinical-500 to-indigo-600 hover:from-clinical-600 hover:to-indigo-700 text-white font-bold px-8 py-4 rounded-2xl shadow-xl shadow-clinical-500/25 hover:shadow-clinical-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 flex items-center justify-center gap-2 group text-center">
               Criar minha Landing Page
               <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="border border-slate-700 hover:border-slate-500 bg-slate-900/60 backdrop-blur-md text-slate-200 font-semibold px-8 py-4 rounded-2xl hover:bg-slate-900 transition-all duration-200 flex items-center justify-center gap-2">
+            </Link>
+            <a href="#beneficios" className="border border-slate-700 hover:border-slate-500 bg-slate-900/60 backdrop-blur-md text-slate-200 font-semibold px-8 py-4 rounded-2xl hover:bg-slate-900 transition-all duration-200 flex items-center justify-center gap-2 text-center">
               Ver Demonstração
-            </button>
+            </a>
           </div>
 
           {/* Quick Metrics */}
