@@ -24,8 +24,8 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **Integração Dinâmica com OpenAI:** Geração de anúncios (Google e Meta Ads) e posts de redes sociais via `gpt-4o-mini` com Prompt Engineering ético, com sistema de fallback local inteligente e dupla camada de guardrails semânticos (CFP/CFM).
 * [x] **Integração de Contas de Anúncios (OAuth2):** Conexão simulada das APIs do Google Ads/Meta Ads para controle direto de orçamentos e publicação via painel, com acompanhamento de métricas de desempenho em tempo real.
 
-### 🔴 Fase 3: Ecossistema Conectado (Futuro)
-* [ ] **Agendamento Integrado:** Sincronização automática com a agenda do Google e agendador de consultas na LP.
+### 🟡 Fase 3: Ecossistema Conectado (Em Progresso)
+* [ ] **Agendamento Integrado (Em Execução):** Sincronização automática com a agenda do Google e agendador de consultas na LP.
 * [ ] **Editor Avançado de Blocos:** Customização livre de layouts de landing pages.
 * [ ] **WhatsApp Automation:** Disparador de notificações automáticas via WhatsApp (Evolution API/Z-API).
 
