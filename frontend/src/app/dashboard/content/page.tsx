@@ -55,9 +55,9 @@ export default function ContentSuggestions() {
     return (
       <div className="h-[50vh] flex flex-col items-center justify-center text-slate-500 text-center max-w-md mx-auto gap-4">
         <Sparkles className="h-10 w-10 text-clinical-500 opacity-60 animate-pulse" />
-        <h3 className="font-extrabold text-white text-lg">Perfil Profissional Necessário</h3>
-        <p className="text-xs leading-relaxed">
-          Para que a inteligência artificial gere ideias personalizadas com a sua geolocalização e especialidade, você deve preencher seu perfil profissional primeiro.
+        <h3 className="font-extrabold text-white text-lg">Erro ao Carregar Sugestões</h3>
+        <p className="text-xs text-red-400 leading-relaxed bg-red-500/5 border border-red-500/10 px-4 py-3 rounded-xl w-full">
+          {error}
         </p>
         <a
           href="/dashboard/profile"
