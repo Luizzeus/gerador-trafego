@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
@@ -35,10 +35,116 @@ export class CampaignSuggestionService {
       throw new NotFoundException('Perfil profissional não encontrado. Configure seu perfil antes de gerar sugestões.');
     }
 
+    const openaiKey = process.env.OPENAI_API_KEY;
     const city = profile.addressCity || 'sua região';
+
+    // 1. Tenta gerar via OpenAI API se a chave estiver configurada
+    if (openaiKey) {
+      try {
+        console.log(`Iniciando geração via OpenAI (gpt-4o-mini) para o usuário ${userId}...`);
+        
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${openaiKey}`,
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            response_format: { type: 'json_object' },
+            messages: [
+              {
+                role: 'system',
+                content: `Você é um especialista em marketing ético e tráfego pago para profissionais de saúde (psicólogos e cuidadores). 
+Sua tarefa é gerar sugestões de campanhas publicitárias e posts de redes sociais com base no perfil do profissional.
+Você DEVE respeitar estritamente as regras éticas do Conselho Federal de Psicologia (CFP) e do Conselho Federal de Medicina/Enfermagem (CFM/COFEN):
+- Nunca prometa cura, melhora garantida ou soluções milagrosas.
+- Nunca faça autodiagnósticos ou sugira tratamentos infalíveis/definitivos.
+- Mantenha um tom educativo, preventivo, profissional e acolhedor.
+- Não exiba tabelas de preços públicos ou promoções de desconto mercantilistas.
+
+Você deve responder exclusivamente no formato JSON. O JSON deve possuir a seguinte estrutura exata:
+{
+  "googleAds": [
+    {
+      "title": "Título do anúncio de busca (máx 30 caracteres)",
+      "description": "Descrição do anúncio de busca (máx 90 caracteres)",
+      "keywords": "Palavras-chave separadas por vírgula"
+    },
+    {
+      "title": "Segundo título do anúncio (máx 30 caracteres)",
+      "description": "Segunda descrição do anúncio (máx 90 caracteres)",
+      "keywords": "Palavras-chave adicionais"
+    }
+  ],
+  "metaAds": [
+    {
+      "primaryText": "Texto principal persuasivo e informativo para redes sociais (Facebook/Instagram Ads)",
+      "headline": "Título do anúncio no Meta",
+      "description": "Descrição curta exibida abaixo do título",
+      "creativeGuidance": "Diretrizes visuais éticas recomendadas para a imagem ou vídeo do anúncio"
+    }
+  ],
+  "socialMediaPost": "Legenda completa para uma postagem informativa no Instagram com hashtags apropriadas",
+  "videoScript": "Roteiro detalhado para um vídeo curto (Reels/TikTok) estruturado em [Gancho], [Introdução], [Desenvolvimento] e [Chamada para Ação]"
+}`,
+              },
+              {
+                role: 'user',
+                content: `Nicho de atuação: ${profile.niche} (${profile.niche === 'psychologist' ? 'Psicólogo' : 'Cuidador de Idosos / Home Care'})
+Nome Completo: ${profile.fullName}
+Registro Profissional: ${profile.registerNumber} (${profile.registerState})
+Cidade de Atendimento: ${profile.addressCity} (${profile.addressState})
+Biografia/Especialidades: ${profile.bio || 'Não informado'}
+
+Gere sugestões de anúncios e conteúdos altamente personalizados e focados para tráfego pago local na cidade de ${city}.`,
+              },
+            ],
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const jsonContent = JSON.parse(data.choices[0].message.content);
+          
+          // Formata e aplica o Guardrail local em tudo como segunda camada de proteção
+          const sanitizedGoogleAds = (jsonContent.googleAds || []).map((ad: any) => ({
+            title: this.applySemanticGuardrail(ad.title || ''),
+            description: this.applySemanticGuardrail(ad.description || ''),
+            keywords: this.applySemanticGuardrail(ad.keywords || ''),
+          }));
+
+          const sanitizedMetaAds = (jsonContent.metaAds || []).map((ad: any) => ({
+            primaryText: this.applySemanticGuardrail(ad.primaryText || ''),
+            headline: this.applySemanticGuardrail(ad.headline || ''),
+            description: this.applySemanticGuardrail(ad.description || ''),
+            creativeGuidance: this.applySemanticGuardrail(ad.creativeGuidance || ''),
+          }));
+
+          const sanitizedSocial = this.applySemanticGuardrail(jsonContent.socialMediaPost || '');
+          const sanitizedVideo = this.applySemanticGuardrail(jsonContent.videoScript || '');
+
+          console.log('Sugestões geradas via OpenAI com sucesso!');
+          return {
+            niche: profile.niche,
+            googleAds: sanitizedGoogleAds,
+            metaAds: sanitizedMetaAds,
+            socialMediaPost: sanitizedSocial,
+            videoScript: sanitizedVideo,
+            source: 'openai',
+          };
+        } else {
+          console.warn('Resposta de erro da OpenAI API, usando fallback local:', await response.text());
+        }
+      } catch (err) {
+        console.error('Falha de conexão com a OpenAI API, usando fallback local:', err);
+      }
+    }
+
+    // 2. Fallback local: Se a chave não estiver definida ou a requisição falhar
+    console.log('Usando gerador de templates locais (Fallback)...');
     const isPsychologist = profile.niche === 'psychologist';
 
-    // Modelagem das Sugestões com base no Nicho do usuário
     let googleAdsSuggestions = [];
     let metaAdsSuggestions = [];
     let socialMediaPost = '';
@@ -49,7 +155,7 @@ export class CampaignSuggestionService {
         {
           title: `Psicologia em ${city} | Dra. ${profile.fullName.split(' ').slice(-2).join(' ')}`,
           description: `Atendimento ético focado em saúde mental e inteligência emocional em ${city}. Agende uma primeira consulta presencial ou por videoconferência.`,
-          keywords: `psicólogo em ${city}, terapia de ansiedade, psicólogo clínico ${city}, terapia cognitivo comportamental, psicólogo online`,
+          keywords: `psicólogo em ${city}, terapia de ansiedade, psicólogo clínico ${city}, terapia cognitivo profissional, psicólogo online`,
         },
         {
           title: `Terapia de Ansiedade | Consulta com Psicólogo`,
@@ -100,7 +206,6 @@ export class CampaignSuggestionService {
       videoScript = `[Gancho - 3 segundos]\nVocê sente dificuldades para conciliar sua rotina profissional com os cuidados que seus pais idosos precisam?\n\n[Introdução - 10 segundos]\nOlá! Sou cuidador especializado em assistência domiciliar em ${city}. Sei que essa conciliação de rotinas gera desgaste e preocupação nas famílias.\n\n[Desenvolvimento - 30 segundos]\nContar com a ajuda de um cuidador profissional não significa afastar-se de quem você ama, mas sim garantir que eles tenham suporte especializado e seguro para alimentação, administração de medicações no horário correto e acompanhamento de mobilidade enquanto você cumpre suas obrigações.\n\n[Chamada para Ação - 15 segundos]\nProporcione tranquilidade para sua família. Clique no botão de contato abaixo ou acesse meu WhatsApp para agendarmos uma entrevista familiar sem compromisso.`;
     }
 
-    // Aplicação estrita do Guardrail Ético em todos os campos gerados
     const sanitizeObject = (obj: any) => {
       const result: any = {};
       for (const key in obj) {
@@ -119,6 +224,7 @@ export class CampaignSuggestionService {
       metaAds: metaAdsSuggestions.map(sanitizeObject),
       socialMediaPost: this.applySemanticGuardrail(socialMediaPost),
       videoScript: this.applySemanticGuardrail(videoScript),
+      source: 'local',
     };
   }
 }

@@ -21,13 +21,30 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **Mock Payment Gateway:** Simulador de faturamento local out-of-the-box para testes de webhook sem necessidade de chaves de produção.
 * [x] **Emissão de Notas Fiscais (NFS-e):** Geração simulada de URL de notas fiscais a partir da confirmação do webhook.
 * [x] **Módulo de Sugestão de Campanhas (Guardrail Ético):** Motor de higienização semântica de termos vetados (ex: impede promessas de "cura", "milagres" ou "garantias", convertendo-os em terminologias educativas e éticas).
-* [ ] **Integração Dinâmica com OpenAI (Em Execução):** Geração de anúncios e posts via GPT-4o-mini com Prompt Engineering ético.
+* [x] **Integração Dinâmica com OpenAI:** Geração de anúncios (Google e Meta Ads) e posts de redes sociais via `gpt-4o-mini` com Prompt Engineering ético, com sistema de fallback local inteligente e dupla camada de guardrails semânticos (CFP/CFM).
 * [ ] **Integração de Contas de Anúncios (OAuth2):** Conexão das APIs do Google Ads/Meta Ads para controle direto de orçamentos e publicação via painel.
 
 ### 🔴 Fase 3: Ecossistema Conectado (Futuro)
 * [ ] **Agendamento Integrado:** Sincronização automática com a agenda do Google e agendador de consultas na LP.
 * [ ] **Editor Avançado de Blocos:** Customização livre de layouts de landing pages.
 * [ ] **WhatsApp Automation:** Disparador de notificações automáticas via WhatsApp (Evolution API/Z-API).
+
+---
+
+## 🚀 Implementações Recentes (Fase 2)
+
+Durante as iterações da Fase 2, as seguintes soluções foram desenhadas e implementadas com sucesso:
+
+1. **Módulo de Assinaturas SaaS & Simulador de Webhook**:
+   - Integração das assinaturas de planos mensais via API do **Asaas** com suporte a pagamentos recorrentes e PIX.
+   - Criação de um endpoint simulado de webhook (`/payments/simulate-webhook/:id`) que permite disparar a confirmação de recebimento direto no banco local (SQLite) sem necessidade de configuração de chaves externas de produção em ambiente local.
+   - Simulação automática de emissão de NFS-e anexando uma URL de visualização fictícia à transação quitada.
+
+2. **Integração Resiliente com OpenAI & Guardrails Éticos**:
+   - Desenvolvimento do motor de IA integrado no backend NestJS (utilizando a API `fetch` nativa) direcionado ao modelo `gpt-4o-mini`.
+   - Inclusão de um prompt de sistema rigoroso para garantir a conformidade com as diretrizes do Conselho Federal de Psicologia (CFP) e do Conselho Federal de Medicina/Enfermagem (CFM/COFEN).
+   - **Mecanismo de Fallback local**: Caso o token da OpenAI não esteja configurado no ambiente local (`OPENAI_API_KEY`) ou se a chamada falhar por cota/rede, a aplicação detecta o erro e recorre imediatamente à geração baseada em templates dinâmicos geolocalizados locais, retornando status transparente (`source: 'local'`).
+   - **Dupla camada de Guardrails**: Tanto o conteúdo retornado pela OpenAI quanto os templates locais passam por uma verificação semântica estrita para neutralizar e sanitizar termos proibidos (ex: trocando promessas de "cura rápida" ou "garantias" por linguagem acolhedora e informativa, em conformidade ética).
 
 ---
 
