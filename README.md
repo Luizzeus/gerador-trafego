@@ -16,13 +16,13 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **Consentimento LGPD:** Registro inalterável e criptográfico de aceitação do termo (`ConsentLog`) com hash SHA-256 (salvando IP, timestamp e conteúdo).
 * [x] **CRM Kanban de Leads:** Funil interativo (Novo, Em Contato, Agendado, Convertido, Perdido) com atalho de redirecionamento rápido para WhatsApp.
 
-### 🟡 Fase 2: Automação & Faturamento (Em Progresso)
+### 🟢 Fase 2: Automação & Faturamento (Concluída)
 * [x] **Módulo de Assinaturas (SaaS):** Integração com o gateway **Asaas** para geração de PIX e faturamento mensal recorrente.
 * [x] **Mock Payment Gateway:** Simulador de faturamento local out-of-the-box para testes de webhook sem necessidade de chaves de produção.
 * [x] **Emissão de Notas Fiscais (NFS-e):** Geração simulada de URL de notas fiscais a partir da confirmação do webhook.
 * [x] **Módulo de Sugestão de Campanhas (Guardrail Ético):** Motor de higienização semântica de termos vetados (ex: impede promessas de "cura", "milagres" ou "garantias", convertendo-os em terminologias educativas e éticas).
 * [x] **Integração Dinâmica com OpenAI:** Geração de anúncios (Google e Meta Ads) e posts de redes sociais via `gpt-4o-mini` com Prompt Engineering ético, com sistema de fallback local inteligente e dupla camada de guardrails semânticos (CFP/CFM).
-* [ ] **Integração de Contas de Anúncios (OAuth2):** Conexão das APIs do Google Ads/Meta Ads para controle direto de orçamentos e publicação via painel.
+* [x] **Integração de Contas de Anúncios (OAuth2):** Conexão simulada das APIs do Google Ads/Meta Ads para controle direto de orçamentos e publicação via painel, com acompanhamento de métricas de desempenho em tempo real.
 
 ### 🔴 Fase 3: Ecossistema Conectado (Futuro)
 * [ ] **Agendamento Integrado:** Sincronização automática com a agenda do Google e agendador de consultas na LP.
@@ -45,6 +45,12 @@ Durante as iterações da Fase 2, as seguintes soluções foram desenhadas e imp
    - Inclusão de um prompt de sistema rigoroso para garantir a conformidade com as diretrizes do Conselho Federal de Psicologia (CFP) e do Conselho Federal de Medicina/Enfermagem (CFM/COFEN).
    - **Mecanismo de Fallback local**: Caso o token da OpenAI não esteja configurado no ambiente local (`OPENAI_API_KEY`) ou se a chamada falhar por cota/rede, a aplicação detecta o erro e recorre imediatamente à geração baseada em templates dinâmicos geolocalizados locais, retornando status transparente (`source: 'local'`).
    - **Dupla camada de Guardrails**: Tanto o conteúdo retornado pela OpenAI quanto os templates locais passam por uma verificação semântica estrita para neutralizar e sanitizar termos proibidos (ex: trocando promessas de "cura rápida" ou "garantias" por linguagem acolhedora e informativa, em conformidade ética).
+
+3. **Integração de Contas de Anúncios (OAuth2) & Gestão de Campanhas**:
+   - Conexão e desconexão de contas do Google Ads e Meta Ads através de fluxo OAuth2 simulado com tela de consentimento de escopos de anúncio.
+   - Painel interativo de **Campanhas de Anúncios** com listagem de campanhas ativas, controle de execução (Play/Pause) e exclusão.
+   - Geração de **Métricas de Performance Dinâmicas** (Gasto, Impressões, Cliques, CTR, Conversões, CPC) calculadas de forma determinística e incremental a partir do orçamento diário da campanha para simular o tráfego de leads qualificados.
+   - Wizard passo a passo para lançar campanhas vinculadas às Landing Pages publicadas do usuário, importando automaticamente as copys recomendadas pela IA com apenas um clique.
 
 ---
 

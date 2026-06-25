@@ -95,6 +95,44 @@ export const api = {
     return fetchApi('/campaign-suggestions/generate', { method: 'GET' });
   },
 
+  // Campanhas de Anúncios & Integrações
+  async getCampaigns() {
+    return fetchApi('/campaign', { method: 'GET' });
+  },
+
+  async createCampaign(body: any) {
+    return fetchApi('/campaign', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  async updateCampaignStatus(id: string, status: string) {
+    return fetchApi(`/campaign/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  async deleteCampaign(id: string) {
+    return fetchApi(`/campaign/${id}`, { method: 'DELETE' });
+  },
+
+  async getAdsConnections() {
+    return fetchApi('/campaign/connections', { method: 'GET' });
+  },
+
+  async connectAdsAccount(body: { provider: string; accountName: string; accountId: string }) {
+    return fetchApi('/campaign/connections', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  async disconnectAdsAccount(provider: string) {
+    return fetchApi(`/campaign/connections/${provider}`, { method: 'DELETE' });
+  },
+
   // Faturamento e Pagamentos
   async getBillingStatus() {
     return fetchApi('/payments/status', { method: 'GET' });

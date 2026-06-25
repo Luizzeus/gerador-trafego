@@ -8,6 +8,7 @@ import { LandingPageModule } from './landing-page/landing-page.module';
 import { LeadModule } from './lead/lead.module';
 import { CampaignSuggestionModule } from './campaign-suggestion/campaign-suggestion.module';
 import { PaymentModule } from './payment/payment.module';
+import { CampaignModule } from './campaign/campaign.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { PaymentModule } from './payment/payment.module';
     LeadModule,
     CampaignSuggestionModule,
     PaymentModule,
+    CampaignModule,
   ],
   controllers: [AppController],
   providers: [AppService],

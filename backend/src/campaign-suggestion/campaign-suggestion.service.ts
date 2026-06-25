@@ -43,6 +43,9 @@ export class CampaignSuggestionService {
       try {
         console.log(`Iniciando geração via OpenAI (gpt-4o-mini) para o usuário ${userId}...`);
         
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 6000);
+
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
           method: 'POST',
           headers: {
@@ -59,7 +62,7 @@ export class CampaignSuggestionService {
 Sua tarefa é gerar sugestões de campanhas publicitárias e posts de redes sociais com base no perfil do profissional.
 Você DEVE respeitar estritamente as regras éticas do Conselho Federal de Psicologia (CFP) e do Conselho Federal de Medicina/Enfermagem (CFM/COFEN):
 - Nunca prometa cura, melhora garantida ou soluções milagrosas.
-- Nunca faça autodiagnósticos ou sugira tratamentos infalíveis/definitivos.
+- Nunca faça autodiagnósticos ou sugira treatments infalíveis/definitivos.
 - Mantenha um tom educativo, preventivo, profissional e acolhedor.
 - Não exiba tabelas de preços públicos ou promoções de desconto mercantilistas.
 
@@ -86,7 +89,7 @@ Você deve responder exclusivamente no formato JSON. O JSON deve possuir a segui
     }
   ],
   "socialMediaPost": "Legenda completa para uma postagem informativa no Instagram com hashtags apropriadas",
-  "videoScript": "Roteiro detalhado para um vídeo curto (Reels/TikTok) estruturado em [Gancho], [Introdução], [Desenvolvimento] e [Chamada para Ação]"
+  "videoScript": "Roteiro detalhado para um vídeo curto (Reels/TikTok) estruturado in [Gancho], [Introdução], [Desenvolvimento] e [Chamada para Ação]"
 }`,
               },
               {
@@ -101,7 +104,10 @@ Gere sugestões de anúncios e conteúdos altamente personalizados e focados par
               },
             ],
           }),
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           const data = await response.json();

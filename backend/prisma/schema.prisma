@@ -20,6 +20,7 @@ model User {
   campaigns            Campaign[]
   payments             Payment[]
   auditLogs            AuditLog[]
+  adsCredentials       AdsCredential[]
 }
 
 model ProfessionalProfile {
@@ -94,6 +95,7 @@ model Campaign {
   name                      String
   channel                   String      // "google_ads" | "meta_ads" | "organic_social"
   adsAccountCredentialsId   String?
+  adsCredential             AdsCredential? @relation(fields: [adsAccountCredentialsId], references: [id], onDelete: SetNull)
   budget                    Float
   targetKeywords            String?     // Lista separada por vírgulas ou texto livre
   status                    String      // "draft" | "active" | "paused" | "ended"
@@ -187,4 +189,22 @@ model ContentSuggestion {
   generatedBody   String
   ethicalApproved Boolean  @default(true)
   createdAt       DateTime @default(now())
+}
+
+model AdsCredential {
+  id           String     @id @default(uuid())
+  userId       String
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  provider     String     // "google_ads" | "meta_ads"
+  accountName  String
+  accountId    String
+  accessToken  String
+  refreshToken String
+  expiresAt    DateTime
+  status       String     // "connected" | "expired"
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  campaigns    Campaign[]
+
+  @@unique([userId, provider])
 }
