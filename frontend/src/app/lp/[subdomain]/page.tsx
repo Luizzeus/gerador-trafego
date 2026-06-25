@@ -405,7 +405,7 @@ export default function PublicLp({ params }: { params: { subdomain: string } }) 
                       <Loader2 className="h-5 w-5 animate-spin" />
                     ) : (
                       <>
-                        Enviar e Falar no WhatsApp
+                        {content.ctaText || "Enviar e Falar no WhatsApp"}
                         <ArrowRight className="h-4 w-4" />
                       </>
                     )}

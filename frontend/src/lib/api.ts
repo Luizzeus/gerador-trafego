@@ -66,6 +66,10 @@ export const api = {
     return fetchApi(`/landing-pages/${id}`, { method: 'PATCH', body: JSON.stringify(body) });
   },
 
+  async getLpById(id: string) {
+    return fetchApi(`/landing-pages/${id}`, { method: 'GET' });
+  },
+
   async getMyLps() {
     return fetchApi('/landing-pages/me', { method: 'GET' });
   },

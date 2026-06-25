@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { 
   FileText, 
@@ -11,10 +12,12 @@ import {
   Loader2, 
   CheckCircle,
   ToggleLeft,
-  ToggleRight
+  ToggleRight,
+  Edit3
 } from 'lucide-react';
 
 export default function LandingPages() {
+  const router = useRouter();
   const [lps, setLps] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
@@ -290,9 +293,16 @@ export default function LandingPages() {
                     </a>
                     <button
                       onClick={() => openEditModal(lp)}
-                      className="bg-clinical-500/10 hover:bg-clinical-500/20 text-teal-400 text-xs font-bold px-3 py-2 rounded-xl border border-clinical-500/20 transition-all duration-200"
+                      className="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all duration-200"
                     >
                       Configurar
+                    </button>
+                    <button
+                      onClick={() => router.push(`/dashboard/landing-pages/${lp.id}/editor`)}
+                      className="bg-clinical-500/10 hover:bg-clinical-500/20 text-teal-400 text-xs font-bold px-3 py-2 rounded-xl border border-clinical-500/20 transition-all duration-200 flex items-center gap-1"
+                    >
+                      <Edit3 className="h-3.5 w-3.5" />
+                      Editar Conteúdo
                     </button>
                   </div>
                 </div>
