@@ -9,6 +9,7 @@ import { LeadModule } from './lead/lead.module';
 import { CampaignSuggestionModule } from './campaign-suggestion/campaign-suggestion.module';
 import { PaymentModule } from './payment/payment.module';
 import { CampaignModule } from './campaign/campaign.module';
+import { AppointmentModule } from './appointment/appointment.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { CampaignModule } from './campaign/campaign.module';
     CampaignSuggestionModule,
     PaymentModule,
     CampaignModule,
+    AppointmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

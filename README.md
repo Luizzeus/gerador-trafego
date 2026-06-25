@@ -25,9 +25,26 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **Integração de Contas de Anúncios (OAuth2):** Conexão simulada das APIs do Google Ads/Meta Ads para controle direto de orçamentos e publicação via painel, com acompanhamento de métricas de desempenho em tempo real.
 
 ### 🟡 Fase 3: Ecossistema Conectado (Em Progresso)
-* [ ] **Agendamento Integrado (Em Execução):** Sincronização automática com a agenda do Google e agendador de consultas na LP.
+* [x] **Agendamento Integrado (Concluído):** Formulário de pré-agendamento público na Landing Page integrado à captura de leads, sincronização simulada com o Google Calendar via OAuth2 mockado, e geração dinâmica de links de reuniões do Google Meet ao confirmar consultas.
 * [ ] **Editor Avançado de Blocos:** Customização livre de layouts de landing pages.
 * [ ] **WhatsApp Automation:** Disparador de notificações automáticas via WhatsApp (Evolution API/Z-API).
+
+---
+
+## 🚀 Implementações Recentes (Fase 3)
+
+Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e implementadas com sucesso:
+
+1. **Agendamento de Consultas na Landing Page**:
+   - Adição de checkbox opcional no formulário de contato para agendamento.
+   - Seleção dinâmica de data (com bloqueio de datas retroativas) e horários de consulta.
+   - Criação automática e vinculada do Lead e da Consulta (`Appointment`) com status pendente no banco de dados.
+
+2. **Gestão de Agenda de Consultas & Google Calendar Sync**:
+   - Nova página no painel administrativo (**Agenda de Consultas**) com visualização organizada por abas (Pendentes, Confirmados, Cancelados).
+   - Módulo de sincronização via fluxo de consentimento OAuth2 simulado para o Google Calendar, armazenando o status de conexão de forma resiliente.
+   - Geração automática e dinâmica de links exclusivos do **Google Meet** (`https://meet.google.com/xxx-xxxx-xxx`) na confirmação de consultas pendentes se a agenda estiver vinculada.
+   - Fluxo de cancelamento/declínio que invalida e limpa os links gerados.
 
 ---
 

@@ -29,6 +29,9 @@ export default function PublicLp({ params }: { params: { subdomain: string } }) 
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [shouldSchedule, setShouldSchedule] = useState(false);
+  const [scheduleDate, setScheduleDate] = useState('');
+  const [scheduleTime, setScheduleTime] = useState('09:00');
 
   const consentText = "Concordo em fornecer meus dados de contato para fins de agendamento e retorno de atendimento profissional de saúde, em conformidade com as diretrizes de privacidade da LGPD.";
 
@@ -93,21 +96,41 @@ export default function PublicLp({ params }: { params: { subdomain: string } }) 
       return;
     }
 
+    if (shouldSchedule && (!scheduleDate || !scheduleTime)) {
+      setError('Selecione uma data e horário válidos.');
+      return;
+    }
+
     setSubmitting(true);
     setError('');
 
     try {
-      // Captura o Lead no backend
-      await api.captureLead({
-        landingPageId: lp.id,
-        name,
-        email: email || undefined,
-        phone,
-        serviceCategoryId: 1, // ID padrão para captação direta
-        trafficSource: document.referrer ? new URL(document.referrer).hostname : 'Direto',
-        consentText,
-        acceptedConsent,
-      });
+      if (shouldSchedule) {
+        const scheduledTime = new Date(`${scheduleDate}T${scheduleTime}:00`).toISOString();
+        await api.scheduleAppointment({
+          landingPageId: lp.id,
+          name,
+          email: email || undefined,
+          phone,
+          serviceCategoryId: 1,
+          scheduledTime,
+          trafficSource: document.referrer ? new URL(document.referrer).hostname : 'Direto',
+          consentText,
+          acceptedConsent,
+        });
+      } else {
+        // Captura o Lead no backend
+        await api.captureLead({
+          landingPageId: lp.id,
+          name,
+          email: email || undefined,
+          phone,
+          serviceCategoryId: 1, // ID padrão para captação direta
+          trafficSource: document.referrer ? new URL(document.referrer).hostname : 'Direto',
+          consentText,
+          acceptedConsent,
+        });
+      }
 
       setSuccess(true);
 
@@ -296,6 +319,65 @@ export default function PublicLp({ params }: { params: { subdomain: string } }) 
                     className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-700 focus:outline-none focus:border-clinical-500 transition-colors"
                   />
                 </div>
+
+                {/* Checkbox para Pré-agendamento */}
+                <div className="pt-1.5 pb-1 border-t border-slate-800/50 mt-1">
+                  <label className="flex items-center gap-2.5 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={shouldSchedule}
+                      onChange={(e) => {
+                        setShouldSchedule(e.target.checked);
+                        if (e.target.checked) {
+                          const tomorrow = new Date();
+                          tomorrow.setDate(tomorrow.getDate() + 1);
+                          setScheduleDate(tomorrow.toISOString().split('T')[0]);
+                        }
+                      }}
+                      className="accent-clinical-500 rounded border-slate-800 focus:ring-clinical-500 animate-pulse"
+                    />
+                    <span className="text-[10px] text-slate-300 font-bold uppercase tracking-wider">
+                      Deseja pré-agendar um horário?
+                    </span>
+                  </label>
+                </div>
+
+                {shouldSchedule && (
+                  <div className="grid grid-cols-2 gap-3 pt-1 pb-2">
+                    <div className="space-y-1">
+                      <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                        Selecione o Dia
+                      </label>
+                      <input
+                        type="date"
+                        required
+                        value={scheduleDate}
+                        min={new Date().toISOString().split('T')[0]}
+                        onChange={(e) => setScheduleDate(e.target.value)}
+                        className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-clinical-500"
+                      />
+                    </div>
+                    
+                    <div className="space-y-1">
+                      <label className="block text-[9px] font-bold uppercase tracking-wider text-slate-500">
+                        Horário
+                      </label>
+                      <select
+                        value={scheduleTime}
+                        onChange={(e) => setScheduleTime(e.target.value)}
+                        className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-clinical-500"
+                      >
+                        <option value="09:00">09:00</option>
+                        <option value="10:00">10:00</option>
+                        <option value="11:00">11:00</option>
+                        <option value="14:00">14:00</option>
+                        <option value="15:00">15:00</option>
+                        <option value="16:00">16:00</option>
+                        <option value="17:00">17:00</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
 
                 {/* Checkbox LGPD */}
                 <div className="pt-2">

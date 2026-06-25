@@ -13,7 +13,8 @@ import {
   Loader2,
   Sparkles,
   CreditCard,
-  Megaphone
+  Megaphone,
+  Calendar
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -68,6 +69,7 @@ export default function DashboardLayout({
     { name: 'CRM de Leads', path: '/dashboard/crm', icon: Users },
     { name: 'Sugestões de Tráfego', path: '/dashboard/content', icon: Sparkles },
     { name: 'Campanhas de Anúncios', path: '/dashboard/campaigns', icon: Megaphone },
+    { name: 'Agenda de Consultas', path: '/dashboard/agenda', icon: Calendar },
     { name: 'Assinatura e Planos', path: '/dashboard/billing', icon: CreditCard },
     { name: 'Perfil Profissional', path: '/dashboard/profile', icon: UserCircle },
   ];
@@ -160,6 +162,7 @@ export default function DashboardLayout({
              pathname === '/dashboard/crm' ? 'CRM Funil de Leads' : 
              pathname === '/dashboard/content' ? 'Sugestões de Tráfego & IA' : 
              pathname === '/dashboard/campaigns' ? 'Campanhas de Anúncios' : 
+             pathname === '/dashboard/agenda' ? 'Agenda de Consultas' : 
              pathname === '/dashboard/billing' ? 'Assinatura e Planos' : 
              pathname === '/dashboard/profile' ? 'Configuração de Perfil' : 'Painel'}
           </h2>

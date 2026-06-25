@@ -133,6 +133,44 @@ export const api = {
     return fetchApi(`/campaign/connections/${provider}`, { method: 'DELETE' });
   },
 
+  // Agendamento & Agenda
+  async scheduleAppointment(body: any) {
+    return fetchApi('/appointment/schedule', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  async getAppointments() {
+    return fetchApi('/appointment', { method: 'GET' });
+  },
+
+  async updateAppointmentStatus(id: string, status: string) {
+    return fetchApi(`/appointment/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
+  },
+
+  async deleteAppointment(id: string) {
+    return fetchApi(`/appointment/${id}`, { method: 'DELETE' });
+  },
+
+  async getGoogleCalendarConnection() {
+    return fetchApi('/appointment/google-calendar', { method: 'GET' });
+  },
+
+  async connectGoogleCalendar(body: { accountName: string; accountId: string }) {
+    return fetchApi('/appointment/google-calendar', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  async disconnectGoogleCalendar() {
+    return fetchApi('/appointment/google-calendar', { method: 'DELETE' });
+  },
+
   // Faturamento e Pagamentos
   async getBillingStatus() {
     return fetchApi('/payments/status', { method: 'GET' });
