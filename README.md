@@ -26,7 +26,7 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 
 ### 🟡 Fase 3: Ecossistema Conectado (Em Progresso)
 * [x] **Agendamento Integrado (Concluído):** Formulário de pré-agendamento público na Landing Page integrado à captura de leads, sincronização simulada com o Google Calendar via OAuth2 mockado, e geração dinâmica de links de reuniões do Google Meet ao confirmar consultas.
-* [ ] **Editor Avançado de Blocos:** Customização livre de layouts de landing pages.
+* [x] **Editor Avançado de Blocos (Concluído):** Customização livre e visual de blocos de conteúdo da Landing Page (Hero, Benefícios e FAQs) com painel side-by-side de visualização em tempo real (Desktop/Mobile).
 * [ ] **WhatsApp Automation:** Disparador de notificações automáticas via WhatsApp (Evolution API/Z-API).
 
 ---
