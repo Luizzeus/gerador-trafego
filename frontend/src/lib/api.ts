@@ -94,4 +94,27 @@ export const api = {
   async getCampaignSuggestions() {
     return fetchApi('/campaign-suggestions/generate', { method: 'GET' });
   },
+
+  // Faturamento e Pagamentos
+  async getBillingStatus() {
+    return fetchApi('/payments/status', { method: 'GET' });
+  },
+
+  async getBillingPlans() {
+    return fetchApi('/payments/plans', { method: 'GET' });
+  },
+
+  async subscribeToPlan(planId: number) {
+    return fetchApi('/payments/subscribe', {
+      method: 'POST',
+      body: JSON.stringify({ planId }),
+    });
+  },
+
+  async simulatePaymentConfirmation(paymentId: string) {
+    return fetchApi(`/payments/simulate-webhook/${paymentId}`, {
+      method: 'POST',
+    });
+  },
 };
+

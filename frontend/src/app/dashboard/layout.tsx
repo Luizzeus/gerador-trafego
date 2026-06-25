@@ -11,7 +11,8 @@ import {
   Activity, 
   MessageSquare, 
   Loader2,
-  Sparkles
+  Sparkles,
+  CreditCard
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -65,6 +66,7 @@ export default function DashboardLayout({
     { name: 'Páginas de Captura', path: '/dashboard/landing-pages', icon: FileText },
     { name: 'CRM de Leads', path: '/dashboard/crm', icon: Users },
     { name: 'Sugestões de Tráfego', path: '/dashboard/content', icon: Sparkles },
+    { name: 'Assinatura e Planos', path: '/dashboard/billing', icon: CreditCard },
     { name: 'Perfil Profissional', path: '/dashboard/profile', icon: UserCircle },
   ];
 
@@ -84,7 +86,7 @@ export default function DashboardLayout({
               MedTraffic
             </span>
           </div>
-
+  
           {/* Menu */}
           <nav className="space-y-1">
             {menuItems.map((item) => {
@@ -107,7 +109,7 @@ export default function DashboardLayout({
             })}
           </nav>
         </div>
-
+  
         {/* User Card & Logout */}
         <div className="space-y-4 pt-6 border-t border-slate-900">
           
@@ -124,7 +126,7 @@ export default function DashboardLayout({
               </div>
             </div>
           </div>
-
+  
           <div className="flex items-center gap-3 px-2">
             <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 font-bold uppercase text-sm">
               {userName ? userName.slice(0, 2) : 'US'}
@@ -134,7 +136,7 @@ export default function DashboardLayout({
               <div className="text-[10px] text-slate-500 truncate">{userRole}</div>
             </div>
           </div>
-
+  
           <button
             onClick={handleLogout}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/5 transition-all duration-200"
@@ -144,7 +146,7 @@ export default function DashboardLayout({
           </button>
         </div>
       </aside>
-
+  
       {/* Main Content Area */}
       <div className="flex-grow flex flex-col overflow-y-auto max-h-screen">
         
@@ -155,8 +157,10 @@ export default function DashboardLayout({
              pathname === '/dashboard/landing-pages' ? 'Páginas de Captura' : 
              pathname === '/dashboard/crm' ? 'CRM Funil de Leads' : 
              pathname === '/dashboard/content' ? 'Sugestões de Tráfego & IA' : 
+             pathname === '/dashboard/billing' ? 'Assinatura e Planos' : 
              pathname === '/dashboard/profile' ? 'Configuração de Perfil' : 'Painel'}
           </h2>
+
           
           <div className="flex items-center gap-4 text-xs font-semibold text-slate-400 bg-slate-900/40 border border-slate-900 px-4 py-2 rounded-xl">
             Ambiente Local: <span className="text-clinical-500 font-bold">SQLite (Ativo)</span>

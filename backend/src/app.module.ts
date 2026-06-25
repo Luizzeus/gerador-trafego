@@ -7,6 +7,7 @@ import { ProfileModule } from './profile/profile.module';
 import { LandingPageModule } from './landing-page/landing-page.module';
 import { LeadModule } from './lead/lead.module';
 import { CampaignSuggestionModule } from './campaign-suggestion/campaign-suggestion.module';
+import { PaymentModule } from './payment/payment.module';
 
 @Module({
   imports: [
@@ -16,8 +17,10 @@ import { CampaignSuggestionModule } from './campaign-suggestion/campaign-suggest
     LandingPageModule,
     LeadModule,
     CampaignSuggestionModule,
+    PaymentModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
