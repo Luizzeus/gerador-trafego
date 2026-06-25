@@ -10,7 +10,8 @@ import {
   LogOut, 
   Activity, 
   MessageSquare, 
-  Loader2 
+  Loader2,
+  Sparkles
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -63,6 +64,7 @@ export default function DashboardLayout({
     { name: 'Geral', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Páginas de Captura', path: '/dashboard/landing-pages', icon: FileText },
     { name: 'CRM de Leads', path: '/dashboard/crm', icon: Users },
+    { name: 'Sugestões de Tráfego', path: '/dashboard/content', icon: Sparkles },
     { name: 'Perfil Profissional', path: '/dashboard/profile', icon: UserCircle },
   ];
 
@@ -152,6 +154,7 @@ export default function DashboardLayout({
             {pathname === '/dashboard' ? 'Geral' : 
              pathname === '/dashboard/landing-pages' ? 'Páginas de Captura' : 
              pathname === '/dashboard/crm' ? 'CRM Funil de Leads' : 
+             pathname === '/dashboard/content' ? 'Sugestões de Tráfego & IA' : 
              pathname === '/dashboard/profile' ? 'Configuração de Perfil' : 'Painel'}
           </h2>
           

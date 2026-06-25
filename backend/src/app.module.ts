@@ -6,9 +6,17 @@ import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './profile/profile.module';
 import { LandingPageModule } from './landing-page/landing-page.module';
 import { LeadModule } from './lead/lead.module';
+import { CampaignSuggestionModule } from './campaign-suggestion/campaign-suggestion.module';
 
 @Module({
-  imports: [PrismaModule, AuthModule, ProfileModule, LandingPageModule, LeadModule],
+  imports: [
+    PrismaModule,
+    AuthModule,
+    ProfileModule,
+    LandingPageModule,
+    LeadModule,
+    CampaignSuggestionModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

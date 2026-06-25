@@ -89,4 +89,9 @@ export const api = {
       body: JSON.stringify({ status }),
     });
   },
+
+  // Sugestões de Campanha e IA
+  async getCampaignSuggestions() {
+    return fetchApi('/campaign-suggestions/generate', { method: 'GET' });
+  },
 };
