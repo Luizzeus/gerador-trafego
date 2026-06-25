@@ -2,20 +2,31 @@ import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/co
 import { PrismaService } from '../prisma/prisma.service';
 import { CaptureLeadDto } from './dto/capture-lead.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 import * as crypto from 'crypto';
 
 @Injectable()
 export class LeadService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly whatsappService: WhatsappService
+  ) {}
 
   async capture(dto: CaptureLeadDto, ip: string, userAgent: string) {
-    // Verifica se a Landing Page existe
+    // Verifica se a Landing Page existe e busca o userId do profissional
     const lp = await this.prisma.landingPage.findUnique({
       where: { id: dto.landingPageId },
+      include: {
+        professionalProfile: {
+          select: {
+            userId: true,
+          },
+        },
+      },
     });
 
-    if (!lp) {
-      throw new NotFoundException('Landing Page de destino não encontrada.');
+    if (!lp || !lp.professionalProfile) {
+      throw new NotFoundException('Landing Page ou perfil profissional de destino não encontrado.');
     }
 
     // Cria o Lead no banco de dados com status inicial 'new'
@@ -46,6 +57,13 @@ export class LeadService {
         consentHash: consentHash,
       },
     });
+
+    // Dispara notificação automática de boas-vindas do WhatsApp se habilitada
+    try {
+      await this.whatsappService.triggerWelcome(lp.professionalProfile.userId, newLead);
+    } catch (err) {
+      console.error('[WhatsApp Trigger Error] Falha ao enviar boas-vindas:', err);
+    }
 
     return newLead;
   }

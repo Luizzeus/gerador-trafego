@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { LeadService } from '../lead/lead.service';
+import { WhatsappService } from '../whatsapp/whatsapp.service';
 
 @Injectable()
 export class AppointmentService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly leadService: LeadService
+    private readonly leadService: LeadService,
+    private readonly whatsappService: WhatsappService
   ) {}
 
   // 1. Conectar Google Calendar (Mock OAuth2)
@@ -211,7 +213,7 @@ export class AppointmentService {
       console.log(`[Google Calendar Sync] Evento cancelado e removido do Google Agenda.`);
     }
 
-    return this.prisma.appointment.update({
+    const updatedAppt = await this.prisma.appointment.update({
       where: { id },
       data: { 
         status,
@@ -221,6 +223,17 @@ export class AppointmentService {
         lead: true,
       },
     });
+
+    // Dispara notificação automática do WhatsApp se habilitada
+    if (status === 'confirmed' || status === 'cancelled') {
+      try {
+        await this.whatsappService.triggerAppointment(userId, updatedAppt, status);
+      } catch (err) {
+        console.error('[WhatsApp Trigger Error] Falha ao notificar consulta:', err);
+      }
+    }
+
+    return updatedAppt;
   }
 
   // 7. Deletar agendamento

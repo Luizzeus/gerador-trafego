@@ -196,5 +196,32 @@ export const api = {
       method: 'POST',
     });
   },
+
+  // WhatsApp Automation
+  async getWhatsappConnection() {
+    return fetchApi('/whatsapp/connection', { method: 'GET' });
+  },
+
+  async connectWhatsapp(body: { instanceName: string; providerType: 'evolution' | 'zapi' }) {
+    return fetchApi('/whatsapp/connection', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  async disconnectWhatsapp() {
+    return fetchApi('/whatsapp/connection', { method: 'DELETE' });
+  },
+
+  async saveWhatsappSettings(body: any) {
+    return fetchApi('/whatsapp/settings', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  },
+
+  async getWhatsappLogs() {
+    return fetchApi('/whatsapp/logs', { method: 'GET' });
+  },
 };
 

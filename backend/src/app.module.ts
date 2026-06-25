@@ -10,6 +10,7 @@ import { CampaignSuggestionModule } from './campaign-suggestion/campaign-suggest
 import { PaymentModule } from './payment/payment.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { AppointmentModule } from './appointment/appointment.module';
+import { WhatsappModule } from './whatsapp/whatsapp.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { AppointmentModule } from './appointment/appointment.module';
     PaymentModule,
     CampaignModule,
     AppointmentModule,
+    WhatsappModule,
   ],
   controllers: [AppController],
   providers: [AppService],

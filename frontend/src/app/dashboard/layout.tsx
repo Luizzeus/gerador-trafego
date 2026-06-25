@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { api } from '@/lib/api';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -27,6 +28,7 @@ export default function DashboardLayout({
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
+  const [whatsappConnected, setWhatsappConnected] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('medtraffic_token');
@@ -42,6 +44,11 @@ export default function DashboardLayout({
         setUserName(user.name || user.email);
         setUserRole(user.role === 'professional' ? 'Profissional da Saúde' : 'Clínica / Home Care');
         setLoading(false);
+
+        // Busca status do WhatsApp em segundo plano
+        api.getWhatsappConnection()
+          .then((conn) => setWhatsappConnected(conn && conn.status === 'connected'))
+          .catch(() => setWhatsappConnected(false));
       } catch (e) {
         localStorage.clear();
         router.push('/login');
@@ -70,6 +77,7 @@ export default function DashboardLayout({
     { name: 'Sugestões de Tráfego', path: '/dashboard/content', icon: Sparkles },
     { name: 'Campanhas de Anúncios', path: '/dashboard/campaigns', icon: Megaphone },
     { name: 'Agenda de Consultas', path: '/dashboard/agenda', icon: Calendar },
+    { name: 'Automação WhatsApp', path: '/dashboard/whatsapp', icon: MessageSquare },
     { name: 'Assinatura e Planos', path: '/dashboard/billing', icon: CreditCard },
     { name: 'Perfil Profissional', path: '/dashboard/profile', icon: UserCircle },
   ];
@@ -119,15 +127,22 @@ export default function DashboardLayout({
           
           {/* WhatsApp Connection status indicator */}
           <div className="bg-slate-900/40 border border-slate-900 p-3.5 rounded-2xl flex items-center gap-3">
-            <div className="bg-emerald-500/15 p-2 rounded-lg text-emerald-400">
+            <div className={`p-2 rounded-lg ${whatsappConnected ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
               <MessageSquare className="h-4 w-4" />
             </div>
             <div>
               <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">WhatsApp Status</div>
-              <div className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5 mt-0.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 block animate-pulse" />
-                Conectado
-              </div>
+              {whatsappConnected ? (
+                <div className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 block animate-pulse" />
+                  Conectado
+                </div>
+              ) : (
+                <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5 mt-0.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-700 block" />
+                  Desconectado
+                </div>
+              )}
             </div>
           </div>
   
