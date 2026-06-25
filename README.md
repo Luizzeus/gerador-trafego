@@ -27,7 +27,7 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 ### 🟡 Fase 3: Ecossistema Conectado (Em Progresso)
 * [x] **Agendamento Integrado (Concluído):** Formulário de pré-agendamento público na Landing Page integrado à captura de leads, sincronização simulada com o Google Calendar via OAuth2 mockado, e geração dinâmica de links de reuniões do Google Meet ao confirmar consultas.
 * [x] **Editor Avançado de Blocos (Concluído):** Customização livre e visual de blocos de conteúdo da Landing Page (Hero, Benefícios e FAQs) com painel side-by-side de visualização em tempo real (Desktop/Mobile).
-* [ ] **WhatsApp Automation:** Disparador de notificações automáticas via WhatsApp (Evolution API/Z-API).
+* [x] **WhatsApp Automation (Concluído):** Disparador de notificações automáticas via WhatsApp (simulação Evolution API/Z-API) integrado ao CRM de Leads e à Agenda de Consultas.
 
 ---
 
@@ -46,14 +46,23 @@ Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e imp
    - Geração automática e dinâmica de links exclusivos do **Google Meet** (`https://meet.google.com/xxx-xxxx-xxx`) na confirmação de consultas pendentes se a agenda estiver vinculada.
    - Fluxo de cancelamento/declínio que invalida e limpa os links gerados.
 
-3. **Arquitetura & Estrutura de Arquivos da Fase 3**:
+3. **Automação de Notificações via WhatsApp (Evolution API / Z-API)**:
+   - Nova tela de gerenciamento de WhatsApp (**Automação WhatsApp**) com pareamento simulado por QR Code, personalização de templates e histórico de disparos.
+   - Disparo automático de mensagens personalizadas no WhatsApp (com as tags dinâmicas `[Nome]`, `[Data]`, `[Hora]`, e `[MeetLink]`) em eventos de novos leads, confirmações e cancelamento de consultas.
+   - Gravação dos disparos como logs de auditoria na tabela `AuditLog` (onde `action: 'SEND_WHATSAPP_NOTIFICATION'`).
+
+4. **Arquitetura & Estrutura de Arquivos da Fase 3**:
    - **Backend (NestJS):**
      * [appointment.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.service.ts) - Lógica de agendamento, controle de status, geração de link de reuniões e sincronização do Google Calendar.
      * [appointment.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.controller.ts) - Endpoints públicos e protegidos (JWT) de consulta, status, criação e credenciais.
      * [appointment.module.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.module.ts) - Definição do módulo de agenda injetando dependências do Prisma e Leads.
+     * [whatsapp.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/whatsapp/whatsapp.service.ts) - Mapeamento de instâncias, templates, triggers e envio de mensagens simuladas.
+     * [whatsapp.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/whatsapp/whatsapp.controller.ts) - Endpoints protegidos (JWT) para status, conexão, logs e configurações.
+     * [whatsapp.module.ts](file:///c:/Projetos/Gerador-trafego/backend/src/whatsapp/whatsapp.module.ts) - Definição global do módulo de WhatsApp.
    - **Frontend (Next.js):**
      * [agenda/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/agenda/page.tsx) - Painel administrativo da agenda e fluxo simulado do Google OAuth2.
      * [lp/[subdomain]/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/lp/%5Bsubdomain%5D/page.tsx) - Integração com o formulário de pré-agendamento e captação de leads.
+     * [whatsapp/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/whatsapp/page.tsx) - Tela de automação de WhatsApp, pareamento QR e logs de disparos.
 
 ---
 
