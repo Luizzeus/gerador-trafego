@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { 
   Search, 
   HelpCircle, 
   BookOpen, 
   ShieldAlert, 
-  Play, 
-  ArrowRight, 
   Sparkles, 
   MessageSquare, 
   ChevronDown, 
@@ -15,7 +13,10 @@ import {
   Send,
   User,
   Bot,
-  Info
+  Info,
+  X,
+  CheckCircle2,
+  AlertCircle
 } from 'lucide-react';
 
 interface FaqItem {
@@ -31,6 +32,8 @@ interface ArticleItem {
   title: string;
   summary: string;
   content: string[];
+  steps?: { title: string; desc: string }[];
+  tips?: string[];
 }
 
 interface ChatMessage {
@@ -42,14 +45,24 @@ export default function HelpCenterPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'concepts' | 'google' | 'medtraffic'>('all');
   const [expandedFaq, setExpandedFaq] = useState<string | null>(null);
+  
+  // Estado do Artigo em Detalhes (Modal)
+  const [selectedArticle, setSelectedArticle] = useState<ArticleItem | null>(null);
 
-  // Estados do Chatbot Simulado
+  // Ref e Efeito para Scroll Automático do Chatbot
+  const chatContainerRef = useRef<HTMLDivElement>(null);
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([
     { sender: 'bot', text: 'Olá! Sou o Assistente Virtual do MedTraffic. Selecione uma das dúvidas comuns abaixo ou digite algo no campo para que eu possa te ajudar imediatamente!' }
   ]);
   const [chatInput, setChatInput] = useState('');
 
-  // Tópicos e Artigos da Central de Ajuda
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatHistory]);
+
+  // Tópicos e Artigos da Central de Ajuda com passos detalhados
   const articles: ArticleItem[] = useMemo(() => [
     {
       id: 'concepts-1',
@@ -57,10 +70,17 @@ export default function HelpCenterPage() {
       title: 'O que é Tráfego Digital?',
       summary: 'Entenda como atrair clientes qualificados de forma contínua para sua página.',
       content: [
-        'Tráfego Digital refere-se ao fluxo de usuários que visitam um canal online, como seu site ou Landing Page. Para profissionais de saúde, isso representa o fluxo de potenciais pacientes/clientes que buscam atendimento.',
-        '• Tráfego Orgânico: Ocorre naturalmente através de buscas do Google, indicações ou postagens gratuitas nas redes sociais. É sustentável a longo prazo, mas exige bastante tempo para trazer resultados consistentes.',
-        '• Tráfego Pago (Anúncios): Consiste em patrocinar links no Google ou criativos no Instagram/Facebook. Você define um orçamento diário para exibir seus serviços para pessoas da sua região que precisam de atendimento imediato, acelerando o retorno.',
-        'A plataforma MedTraffic une ambos: fornece Landing Pages otimizadas para SEO (orgânico) e ferramentas de integração para lançar anúncios de forma rápida e simplificada (pago).'
+        'Tráfego Digital refere-se ao fluxo de visitantes que acessam sua Landing Page ou canal online. Na área da saúde, isso representa as pessoas que estão buscando ativamente por cuidadores ou terapeutas locais.',
+        'Dominar a atração de tráfego é o pilar mais importante para manter uma agenda cheia sem depender apenas de indicações boca-a-boca.'
+      ],
+      steps: [
+        { title: '1. Identifique o Público Alvo', desc: 'Defina a persona de atendimento. Para cuidadores, o público-alvo são os filhos e familiares do idoso. Para psicólogos, são pacientes que buscam especialidades específicas (ex: terapia de casal, ansiedade).' },
+        { title: '2. Escolha entre Orgânico ou Pago', desc: 'O tráfego orgânico (SEO) é gratuito, mas leva meses. O tráfego pago (anúncios) atrai clientes na sua região de forma imediata (questão de horas).' },
+        { title: '3. Prepare a Landing Page', desc: 'A página de captura deve ser rápida, focada em conversão, e conter um formulário simples atrelado ao consentimento LGPD.' },
+        { title: '4. Facilite o Contato', desc: 'Disponibilize o botão direcionador de WhatsApp para que a conversa inicie imediatamente no celular.' }
+      ],
+      tips: [
+        'Recomendamos iniciar com um orçamento modesto em tráfego pago local para validar a conversão da sua Landing Page rapidamente.'
       ]
     },
     {
@@ -69,23 +89,39 @@ export default function HelpCenterPage() {
       title: 'Diferença entre Google Ads e Meta Ads',
       summary: 'Saiba qual canal é ideal para os seus objetivos de marketing.',
       content: [
-        '• Google Ads (Foco em Intenção): O usuário ativamente pesquisa por uma necessidade no buscador (ex: "psicólogo em São Paulo"). Os anúncios respondem diretamente a essa dor, gerando leads com altíssima intenção de contratação.',
-        '• Meta Ads - Instagram/Facebook (Foco em Descoberta/Atenção): O usuário está navegando socialmente e é impactado por uma publicação visual atraente ou vídeo explicativo. É excelente para gerar consciência de marca, divulgar especialidades e atrair pacientes de forma espontânea baseada no perfil geográfico.',
-        'Recomendamos utilizar o Google Ads para captação direta de serviços emergenciais ou consultas e o Meta Ads para fortalecimento de imagem profissional e conteúdos educativos.'
+        'A principal diferença entre as duas plataformas de anúncios está na intenção do usuário.',
+        'Entender essa dinâmica economiza orçamento e atrai contatos muito mais qualificados.'
+      ],
+      steps: [
+        { title: '1. Google Ads (Atração por Intenção)', desc: 'Exiba seus anúncios exatamente para quem está pesquisando no buscador (ex: "cuidador de idosos home care em Pinheiros"). A intenção de contratação é imediata.' },
+        { title: '2. Meta Ads (Atração por Atenção)', desc: 'Exiba posts e vídeos informativos no feed do Instagram/Facebook para pessoas baseadas em interesses e perfil demográfico. Ideal para construir autoridade e conscientizar sobre terapia.' },
+        { title: '3. Definição do Orçamento de Mídia', desc: 'Cadastre seus dados de pagamento diretamente em cada canal de anúncios. O MedTraffic apenas faz a ponte técnica via API.' },
+        { title: '4. Integração do Funil', desc: 'Aponte seus anúncios sempre para a sua Landing Page do MedTraffic para capturar o lead com segurança jurídica (LGPD).' }
+      ],
+      tips: [
+        'Se você é Cuidador ou Psicólogo Clínico com foco em atendimento imediato, inicie pelo Google Ads.',
+        'Se você quer divulgar infoprodutos, palestras ou posicionamento de marca, use o Meta Ads.'
       ]
     },
     {
       id: 'google-1',
       category: 'google',
-      title: 'Como lançar campanhas no Google Ads',
+      title: 'Como configurar e lançar campanhas no Google Ads',
       summary: 'Passo a passo básico para rodar seus primeiros anúncios no Google.',
       content: [
-        'Para lançar anúncios do Google direto no MedTraffic, siga as etapas abaixo:',
-        '1. Crie ou tenha uma Conta no Google Ads: Acesse ads.google.com e configure seus dados de faturamento (boleto, cartão ou PIX).',
-        '2. Conecte sua conta no MedTraffic: No menu lateral "Campanhas", clique em "Configurar Contas (OAuth)" e realize a conexão segura de login com o Google.',
-        '3. Defina o Orçamento Diário: Estipule um limite diário (ex: R$ 20,00 ou R$ 30,00). O Google cobrará apenas quando alguém clicar no seu link (CPC).',
-        '4. Selecione a Landing Page e as Palavras-Chave: Escolha a LP que receberá os leads e adicione as palavras que disparam seu anúncio.',
-        '5. Utilize as Sugestões de IA: O sistema importará automaticamente títulos e descrições otimizados gerados pela inteligência artificial para o formulário de lançamento.'
+        'O assistente de campanhas do MedTraffic permite lançar anúncios de busca direto na sua conta do Google Ads de forma simplificada e integrada.'
+      ],
+      steps: [
+        { title: '1. Crie sua conta de anunciante', desc: 'Acesse ads.google.com, faça o login com sua conta do Google e configure o faturamento (boleto, cartão ou PIX).' },
+        { title: '2. Conecte sua conta no MedTraffic', desc: 'No menu lateral "Campanhas de Anúncios", clique no botão "Configurar Contas (OAuth)", escolha "Conectar Google Ads" e autorize as permissões.' },
+        { title: '3. Configure sua Campanha', desc: 'Clique em "Lançar Campanha". Selecione o canal Google Ads, defina um orçamento diário (ex: R$ 25,00) e selecione a sua Landing Page publicada.' },
+        { title: '4. Adicione as Palavras-Chave de Busca', desc: 'Insira termos que expressem necessidade de busca imediata, separados por vírgula (ex: "psicologo perto de mim, terapia online, consulta psicologo").' },
+        { title: '5. Importe a Copy gerada por IA', desc: 'O assistente preencherá os títulos e descrições do anúncio automaticamente usando copys criadas pela IA, prontas e higienizadas.' },
+        { title: '6. Publique e Acompanhe', desc: 'Clique em publicar e aguarde a barra de progresso da API. Depois, acompanhe os gastos, cliques e leads gerados direto na tabela de campanhas.' }
+      ],
+      tips: [
+        'Acompanhe o status da campanha. Se pausá-la no MedTraffic, o Google Ads interrompe a cobrança imediatamente.',
+        'Sempre monitore as palavras-chave para negativar termos irrelevantes no painel do Google Ads.'
       ]
     },
     {
@@ -94,22 +130,36 @@ export default function HelpCenterPage() {
       title: 'Diretrizes Éticas e de Conformidade (CFP / CFM)',
       summary: 'Como anunciar respeitando os limites éticos do conselho profissional.',
       content: [
-        'Publicidade na área de saúde possui regras rígidas para proteger a integridade dos pacientes. Nosso gerador de conteúdo possui guardrails semânticos automáticos para evitar infrações:',
-        '• O que NÃO Fazer: Não prometa "cura garantida", "métodos infalíveis" ou "diagnóstico sem consulta". Não divulgue preços promocionais como barganha ou faça concorrência desleal.',
-        '• O que FAZER: Crie anúncios estritamente informativos e educativos. Apresente seus diferenciais com foco no acolhimento e na capacitação técnica.',
-        '• Identificação Obrigatória: É lei exibir o seu nome completo, registro do conselho profissional (ex: CRP 06/XXXXX ou COREN) e a Unidade Federativa correspondente de forma visível no rodapé da página.'
+        'A publicidade médica e psicológica possui regras rígidas que proíbem o mercantilismo e garantem a veracidade das informações.',
+        'Descubra como estruturar sua presença digital respeitando essas diretrizes.'
+      ],
+      steps: [
+        { title: '1. Nunca Prometa Resultados Garantidos', desc: 'Evite expressões como "cura garantida", "solução definitiva" ou "tratamento infalível".' },
+        { title: '2. Foco Informativo e Educativo', desc: 'Escreva textos focados em esclarecer dúvidas de saúde, acolhimento e bem-estar, mantendo tom profissional.' },
+        { title: '3. Identificação Legal Obrigatória', desc: 'Sua página de captura deve expor de forma clara seu nome completo, registro do conselho profissional (ex: CRP ou COREN/CFM) e a sigla do estado.' },
+        { title: '4. Não use Preços como Barganha', desc: 'É proibido expor tabelas de valores promocionais, descontos agressivos ou pacotes fechados de consultas no anúncio.' }
+      ],
+      tips: [
+        'Nosso gerador de conteúdo com IA possui guardrails semânticos automáticos que bloqueiam termos proibidos e convertem em terminologias éticas e informativas.'
       ]
     },
     {
       id: 'medtraffic-1',
       category: 'medtraffic',
-      title: 'Gerenciando Leads no CRM e a LGPD',
+      title: 'Gerenciando Leads no CRM e Conformidade LGPD',
       summary: 'Como gerenciar seus leads e obter segurança jurídica total de consentimento.',
       content: [
-        'A plataforma conta com um CRM Kanban interativo para que você acompanhe o andamento de cada lead, desde a captura até a conversão:',
-        '• Colunas do Funil: Mova os cartões por arrastar-e-soltar entre Novo, Em Contato, Agendado, Convertido e Perdido.',
-        '• Redirecionamento de WhatsApp: Clique no botão de WhatsApp no card do lead para iniciar uma conversa imediata no celular.',
-        '• ConsentLog da LGPD: Para cada lead que se cadastra aceitando seus termos de uso, o sistema registra o IP do visitante, o navegador, a data e hora do envio, gerando um hash SHA-256 inalterável. Isso garante conformidade com a Lei Geral de Proteção de Dados (LGPD) em caso de auditorias.'
+        'A plataforma automatiza a captação e organiza seus contatos para facilitar o agendamento de consultas.'
+      ],
+      steps: [
+        { title: '1. Captura com Consentimento', desc: 'O formulário de contato da sua Landing Page obriga o visitante a marcar explicitamente a aceitação dos termos de privacidade.' },
+        { title: '2. Registro do ConsentLog', desc: 'Para cada lead criado, o MedTraffic salva o IP do visitante, o navegador, a data e hora exatas e gera um Hash SHA-256 criptográfico único.' },
+        { title: '3. Organização no Funil Kanban', desc: 'No menu "CRM de Leads", acompanhe os contatos divididos em colunas (Novo, Em Contato, Agendado, Convertido, Perdido) movendo os cards livremente.' },
+        { title: '4. Atalho de WhatsApp Rápido', desc: 'Abra a ficha do lead ou clique no ícone de WhatsApp no card para abrir o chat de conversa imediatamente no seu celular.' },
+        { title: '5. Exportação de Backups', desc: 'Caso queira auditar seus leads ou migrá-los, clique em "Exportar Leads" para baixar a planilha CSV contendo todos os dados, inclusive os hashes da LGPD.' }
+      ],
+      tips: [
+        'Mantenha o status dos leads atualizado no CRM para que os gráficos de faturamento e conversão do Dashboard Geral fiquem corretos.'
       ]
     },
     {
@@ -118,8 +168,17 @@ export default function HelpCenterPage() {
       title: 'Sincronização de Agenda & WhatsApp',
       summary: 'Automatize avisos de reuniões e confirmações de consultas.',
       content: [
-        '• Google Agenda Sync: Na tela "Agenda de Consultas", conecte sua conta Google via OAuth. Toda vez que você clicar em "Confirmar Consulta" para um lead pendente, o sistema cria automaticamente o evento e gera um link dinâmico do Google Meet.',
-        '• Automação de WhatsApp: Conecte o seu número de WhatsApp pessoal via QR Code na aba "Automação WhatsApp". O sistema disparará mensagens de boas-vindas para novos leads, confirmações (incluindo o link do Google Meet) e avisos de cancelamento instantaneamente em segundo plano.'
+        'Aumente a conversão integrando a agenda de consultas com o envio automático de notificações no WhatsApp.'
+      ],
+      steps: [
+        { title: '1. Conecte seu Google Agenda', desc: 'Acesse "Agenda de Consultas", clique em "Conectar Google Agenda" e aprove o consentimento OAuth2 simulado.' },
+        { title: '2. Pareie seu WhatsApp Pessoal', desc: 'Acesse "Automação WhatsApp", preencha os dados e clique em gerar QR Code. Escaneie o código pelo seu aplicativo de celular.' },
+        { title: '3. Captura Automática na LP', desc: 'O paciente pré-agenda uma data e horário diretamente pelo formulário de contato público da Landing Page.' },
+        { title: '4. Confirmação com Google Meet', desc: 'Na lista de consultas Pendentes, clique em "Confirmar Consulta". O sistema cria o evento na agenda, gera um link dinâmico do Google Meet e atualiza o CRM.' },
+        { title: '5. Disparo de WhatsApp', desc: 'O sistema dispara mensagens automáticas para o número do paciente com mensagens personalizadas de boas-vindas, confirmação (contendo o link do Meet) e cancelamento.' }
+      ],
+      tips: [
+        'Se o WhatsApp desconectar, o card indicador na barra lateral esquerda mudará para "Desconectado" (cinza). Basta acessar a aba de automação e re-escanear o QR Code.'
       ]
     }
   ], []);
@@ -160,10 +219,10 @@ export default function HelpCenterPage() {
 
   // Dúvidas comuns para o Chatbot Simulado
   const chatbotPrompts = [
-    { q: 'Como configuro meu WhatsApp?', a: 'Para configurar seu WhatsApp, vá na aba "Automação WhatsApp" no menu lateral. Preencha o nome da sua instância, selecione o provedor (Evolution API ou Z-API) e clique em "Gerar Instância & Conectar". Um QR Code será exibido na tela. Abra o WhatsApp no seu celular, vá em "Aparelhos Conectados" > "Conectar um Aparelho" e escaneie o código. O status mudará imediatamente para "Conectado".' },
-    { q: 'Por que meu anúncio foi rejeitado?', a: 'Anúncios podem ser rejeitados pelo Google ou Meta caso violem políticas de publicidade de saúde, como uso de linguagem agressiva, promessas irreais de tratamentos ou falta de identificação legal. Certifique-se de preencher seus dados de CRP/COREN no perfil e usar o assistente de IA com guardrail ético ativado para refazer a copy.' },
-    { q: 'O que é o ConsentLog da LGPD?', a: 'O ConsentLog é o registro digital da aprovação dos termos de privacidade que o lead aceitou ao preencher seu formulário. Ele fica guardado de forma inalterável no banco de dados contendo IP do lead, data/hora e um Hash SHA-256 criptográfico. Você pode exportar esses dados a qualquer momento pelo CRM para comprovar conformidade legal.' },
-    { q: 'Como sincronizo minha agenda?', a: 'Acesse a tela "Agenda de Consultas" e na seção superior clique em "Conectar Google Agenda". Aceite as permissões no fluxo OAuth2 simulado. Com a conta ativa, sempre que você confirmar um agendamento pendente, a plataforma cria um evento na sua agenda e anexa automaticamente um link do Google Meet para a sessão online.' }
+    { q: 'Como configuro meu WhatsApp?', a: 'Para configurar seu WhatsApp:\n1. Vá na aba "Automação WhatsApp" no menu lateral.\n2. Insira um nome de identificação e escolha o provedor.\n3. Clique em "Gerar Instância & Conectar" para abrir o QR Code.\n4. No seu celular, abra o WhatsApp, acesse "Aparelhos Conectados" > "Conectar um Aparelho" e escaneie o código na tela.\n5. O status mudará imediatamente para "Conectado" (verde) tanto na tela quanto na sidebar.' },
+    { q: 'Por que meu anúncio foi rejeitado?', a: 'As principais causas de rejeição de anúncios na área de saúde são:\n1. Falta do número de registro (CRP/COREN) visível na Landing Page.\n2. Prometer resultados clínicos ou curas imediatas.\n3. Uso de termos proibidos pelo conselho.\n4. Imagens inadequadas.\n\nPara corrigir, preencha os dados do conselho no seu perfil e use a IA de sugestões do MedTraffic que possui guardrails automáticos.' },
+    { q: 'O que é o ConsentLog da LGPD?', a: 'O ConsentLog é uma evidência digital obrigatória. Ele salva:\n1. O endereço IP do visitante.\n2. O navegador/dispositivo utilizado.\n3. O termo de consentimento aceito.\n4. Um Hash SHA-256 criptográfico inalterável.\n\nIsso protege você juridicamente contra multas da ANPD e comprova que o lead autorizou o contato pelo WhatsApp.' },
+    { q: 'Como sincronizo minha agenda?', a: 'Siga este passo a passo para a agenda:\n1. Acesse "Agenda de Consultas" no menu esquerdo.\n2. No banner superior, clique em "Conectar Google Agenda".\n3. Realize o login no pop-up OAuth simulado para autorizar o vínculo.\n4. Ao receber novos agendamentos da Landing Page (na aba Pendentes), clique em "Confirmar Consulta".\n5. O MedTraffic gerará automaticamente o evento na sua agenda física e criará o link do Google Meet.' }
   ];
 
   // Filtros aplicados
@@ -203,10 +262,8 @@ export default function HelpCenterPage() {
     const userText = chatInput;
     setChatInput('');
 
-    // Adiciona mensagem do usuário
     setChatHistory(prev => [...prev, { sender: 'user', text: userText }]);
 
-    // Busca correspondência com chatbotPrompts ou dá resposta padrão
     setTimeout(() => {
       const match = chatbotPrompts.find(p => 
         userText.toLowerCase().includes(p.q.toLowerCase()) || 
@@ -216,7 +273,7 @@ export default function HelpCenterPage() {
 
       const botResponse = match 
         ? match.a 
-        : `Entendi a sua dúvida sobre "${userText}". Para este caso específico, recomendo consultar os artigos nas abas acima ou verificar o manual completo da plataforma no menu de recursos do MedTraffic.`;
+        : `Entendi a sua dúvida sobre "${userText}". Para este caso específico, recomendo consultar os artigos nas abas da Central de Ajuda ou verificar as etapas do manual detalhado clicando nos cartões de guias de aprendizado.`;
 
       setChatHistory(prev => [...prev, { sender: 'bot', text: botResponse }]);
     }, 400);
@@ -335,7 +392,8 @@ export default function HelpCenterPage() {
                 {filteredArticles.map((art) => (
                   <div 
                     key={art.id}
-                    className="group bg-slate-900/30 hover:bg-slate-900/50 border border-slate-900 hover:border-slate-800 p-6 rounded-3xl flex flex-col justify-between gap-4 transition-all duration-300"
+                    onClick={() => setSelectedArticle(art)}
+                    className="group bg-slate-900/30 hover:bg-slate-900/50 border border-slate-900 hover:border-slate-800 p-6 rounded-3xl flex flex-col justify-between gap-4 transition-all duration-300 cursor-pointer hover:shadow-lg hover:shadow-clinical-500/5"
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -351,17 +409,14 @@ export default function HelpCenterPage() {
                       <h3 className="text-base font-bold text-white group-hover:text-clinical-400 transition-colors duration-200">
                         {art.title}
                       </h3>
-                      <p className="text-xs text-slate-400 leading-relaxed">
+                      <p className="text-xs text-slate-400 leading-relaxed line-clamp-2">
                         {art.summary}
                       </p>
                     </div>
 
-                    <div className="border-t border-slate-900/60 pt-4 mt-2 space-y-3">
-                      {art.content.slice(0, 2).map((p, idx) => (
-                        <p key={idx} className="text-[11px] text-slate-500 leading-relaxed line-clamp-2">
-                          {p}
-                        </p>
-                      ))}
+                    <div className="border-t border-slate-900/60 pt-4 mt-2 flex items-center justify-between">
+                      <span className="text-[10px] text-slate-500 font-bold group-hover:text-teal-400 transition-colors duration-200">Ver Passo a Passo</span>
+                      <span className="text-[11px] font-bold text-slate-600 group-hover:text-teal-400 group-hover:translate-x-1 transition-all duration-200">&rarr;</span>
                     </div>
                   </div>
                 ))}
@@ -404,7 +459,7 @@ export default function HelpCenterPage() {
                       </button>
                       
                       {isOpen && (
-                        <div className="px-6 pb-5 text-xs text-slate-400 leading-relaxed border-t border-slate-900/60 pt-4 bg-slate-950/40">
+                        <div className="px-6 pb-5 text-xs text-slate-400 leading-relaxed border-t border-slate-900/60 pt-4 bg-slate-950/40 whitespace-pre-line">
                           {faq.answer}
                         </div>
                       )}
@@ -438,7 +493,10 @@ export default function HelpCenterPage() {
             </div>
 
             {/* Corpo das Mensagens */}
-            <div className="flex-grow my-4 overflow-y-auto space-y-3.5 pr-2 z-10 scrollbar-thin scrollbar-thumb-slate-800">
+            <div 
+              ref={chatContainerRef}
+              className="flex-grow my-4 overflow-y-auto space-y-3.5 pr-2 z-10 scrollbar-thin scrollbar-thumb-slate-800"
+            >
               {chatHistory.map((msg, index) => (
                 <div 
                   key={index}
@@ -449,7 +507,7 @@ export default function HelpCenterPage() {
                   }`}>
                     {msg.sender === 'user' ? <User className="h-3.5 w-3.5" /> : <Bot className="h-3.5 w-3.5" />}
                   </div>
-                  <div className={`p-3 rounded-2xl text-[11px] leading-relaxed max-w-[80%] ${
+                  <div className={`p-3 rounded-2xl text-[11px] leading-relaxed max-w-[80%] whitespace-pre-line ${
                     msg.sender === 'user' 
                       ? 'bg-indigo-600/15 text-indigo-200 rounded-tr-none border border-indigo-500/25' 
                       : 'bg-slate-950/60 text-slate-300 rounded-tl-none border border-slate-900'
@@ -468,7 +526,7 @@ export default function HelpCenterPage() {
                   <button
                     key={idx}
                     onClick={() => handlePromptClick(p.q, p.a)}
-                    className="text-[9px] font-bold bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-800 text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-lg transition-all duration-150"
+                    className="text-[9px] font-bold bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-800 text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-lg transition-all duration-150 text-left"
                   >
                     {p.q}
                   </button>
@@ -519,6 +577,98 @@ export default function HelpCenterPage() {
         </div>
 
       </div>
+
+      {/* Modal de Detalhe do Artigo / Manual e Passo a Passo */}
+      {selectedArticle && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 md:p-8 max-w-2xl w-full max-h-[85vh] overflow-y-auto space-y-6 relative shadow-2xl scrollbar-thin scrollbar-thumb-slate-800">
+            
+            {/* Botão Fechar */}
+            <button 
+              onClick={() => setSelectedArticle(null)}
+              className="absolute top-5 right-5 text-slate-400 hover:text-white bg-slate-950/40 p-2 rounded-full border border-slate-800/80 transition-all duration-150"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            {/* Cabeçalho */}
+            <div className="space-y-3">
+              <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider inline-block ${
+                selectedArticle.category === 'concepts' ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20' :
+                selectedArticle.category === 'google' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                'bg-teal-500/10 text-teal-400 border border-teal-500/20'
+              }`}>
+                {selectedArticle.category === 'concepts' ? 'Conceito de Tráfego' :
+                 selectedArticle.category === 'google' ? 'Google Ads & Configuração' : 'Manual MedTraffic'}
+              </span>
+              <h2 className="text-xl md:text-2xl font-extrabold text-white leading-tight">
+                {selectedArticle.title}
+              </h2>
+              <p className="text-xs text-slate-400">
+                {selectedArticle.summary}
+              </p>
+            </div>
+
+            {/* Conteúdo Introdução */}
+            <div className="space-y-3 border-t border-slate-800/60 pt-4">
+              {selectedArticle.content.map((p, idx) => (
+                <p key={idx} className="text-xs text-slate-300 leading-relaxed">
+                  {p}
+                </p>
+              ))}
+            </div>
+
+            {/* Passo a Passo Detalhado */}
+            {selectedArticle.steps && (
+              <div className="space-y-4">
+                <h3 className="text-xs font-extrabold text-teal-400 uppercase tracking-wider flex items-center gap-2">
+                  <CheckCircle2 className="h-4.5 w-4.5 text-teal-400" />
+                  Passo a Passo Recomendado
+                </h3>
+                <div className="space-y-4 bg-slate-950/40 border border-slate-950 p-5 rounded-2xl">
+                  {selectedArticle.steps.map((step, idx) => (
+                    <div key={idx} className="flex gap-4 items-start">
+                      <div className="bg-clinical-500/15 border border-clinical-500/20 text-teal-400 font-bold text-[10px] w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5">
+                        {idx + 1}
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-xs font-bold text-white">{step.title}</h4>
+                        <p className="text-[11px] text-slate-400 leading-relaxed">{step.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Dicas Extras */}
+            {selectedArticle.tips && (
+              <div className="space-y-3 bg-indigo-500/5 border border-indigo-500/10 p-5 rounded-2xl">
+                <h4 className="text-xs font-bold text-indigo-400 flex items-center gap-1.5">
+                  <AlertCircle className="h-4 w-4" />
+                  Dica de Especialista
+                </h4>
+                {selectedArticle.tips.map((tip, idx) => (
+                  <p key={idx} className="text-[11px] text-indigo-300 leading-relaxed">
+                    {tip}
+                  </p>
+                ))}
+              </div>
+            )}
+
+            {/* Rodapé do Modal */}
+            <div className="pt-4 border-t border-slate-800/60 flex justify-end">
+              <button
+                onClick={() => setSelectedArticle(null)}
+                className="bg-clinical-500 hover:bg-clinical-600 text-white font-semibold text-xs px-5 py-2.5 rounded-xl transition-all duration-200"
+              >
+                Entendi, Fechar Guia
+              </button>
+            </div>
+
+          </div>
+        </div>
+      )}
 
     </div>
   );
