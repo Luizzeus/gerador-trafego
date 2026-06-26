@@ -1,9 +1,28 @@
 const { PrismaClient } = require('@prisma/client');
+const bcrypt = require('bcrypt');
 
 const prisma = new PrismaClient();
 
 async function main() {
   console.log('Iniciando o seeding do banco de dados...');
+
+  // 0. Popular Super-Admin 'administrator'
+  const passwordHash = await bcrypt.hash('@ccessINC21*', 10);
+  await prisma.user.upsert({
+    where: { email: 'administrator' },
+    update: {
+      passwordHash,
+      role: 'admin',
+      status: 'active',
+    },
+    create: {
+      email: 'administrator',
+      passwordHash,
+      role: 'admin',
+      status: 'active',
+    },
+  });
+  console.log('Super-Admin "administrator" populado com sucesso!');
 
   // 1. Popular ServiceCategory (Categorias de Serviço)
   const categories = [

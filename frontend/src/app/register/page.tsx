@@ -123,11 +123,11 @@ export default function Register() {
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Tipo de Atuação / Perfil
             </label>
-            <div className="grid grid-cols-3 gap-2 mt-1">
+            <div className="grid grid-cols-2 gap-2 mt-1">
               <button
                 type="button"
                 onClick={() => setRole('professional')}
-                className={`py-2 px-1 rounded-xl border text-[10px] font-bold tracking-wide uppercase transition-all duration-200 ${
+                className={`py-2 px-4 rounded-xl border text-[10px] font-bold tracking-wide uppercase transition-all duration-200 ${
                   role === 'professional'
                     ? 'bg-clinical-500/10 border-clinical-500 text-teal-400'
                     : 'bg-slate-950/40 border-slate-850 text-slate-400 hover:border-slate-700'
@@ -138,24 +138,13 @@ export default function Register() {
               <button
                 type="button"
                 onClick={() => setRole('company_member')}
-                className={`py-2 px-1 rounded-xl border text-[10px] font-bold tracking-wide uppercase transition-all duration-200 ${
+                className={`py-2 px-4 rounded-xl border text-[10px] font-bold tracking-wide uppercase transition-all duration-200 ${
                   role === 'company_member'
                     ? 'bg-clinical-500/10 border-clinical-500 text-teal-400'
                     : 'bg-slate-950/40 border-slate-850 text-slate-400 hover:border-slate-700'
                 }`}
               >
                 Clínica
-              </button>
-              <button
-                type="button"
-                onClick={() => setRole('admin')}
-                className={`py-2 px-1 rounded-xl border text-[10px] font-bold tracking-wide uppercase transition-all duration-200 ${
-                  role === 'admin'
-                    ? 'bg-clinical-500/10 border-clinical-500 text-teal-400'
-                    : 'bg-slate-950/40 border-slate-850 text-slate-400 hover:border-slate-700'
-                }`}
-              >
-                Administrador
               </button>
             </div>
           </div>

@@ -1,5 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AdminService {
@@ -103,6 +104,53 @@ export class AdminService {
       },
       orderBy: {
         acceptedAt: 'desc',
+      },
+    });
+  }
+
+  async getAllUsers() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        createdAt: true,
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+  }
+
+  async updateUserRole(id: string, role: string) {
+    const userToUpdate = await this.prisma.user.findUnique({ where: { id } });
+    if (userToUpdate && userToUpdate.email === 'administrator') {
+      throw new ForbiddenException('O perfil do Administrador Principal não pode ser alterado.');
+    }
+
+    return this.prisma.user.update({
+      where: { id },
+      data: { role },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+      },
+    });
+  }
+
+  async updateUserPassword(id: string, passwordPlain: string) {
+    const passwordHash = await bcrypt.hash(passwordPlain, 10);
+
+    return this.prisma.user.update({
+      where: { id },
+      data: { passwordHash },
+      select: {
+        id: true,
+        email: true,
+        role: true,
       },
     });
   }

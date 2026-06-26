@@ -1,4 +1,4 @@
-import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ConflictException, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
@@ -13,6 +13,10 @@ export class AuthService {
   ) {}
 
   async register(dto: RegisterDto) {
+    if (dto.role === 'admin' || dto.email.toLowerCase() === 'administrator') {
+      throw new ForbiddenException('O cadastro de administradores não é permitido por esta via.');
+    }
+
     const emailExists = await this.prisma.user.findUnique({
       where: { email: dto.email.toLowerCase() },
     });

@@ -266,5 +266,23 @@ export const api = {
   async getCampaignSyncLogs(id: string): Promise<any> {
     return fetchApi(`/campaign/${id}/sync-logs`, { method: 'GET' });
   },
+
+  async getAdminUsers() {
+    return fetchApi('/admin/users', { method: 'GET' });
+  },
+
+  async updateAdminUserRole(id: string, role: string) {
+    return fetchApi(`/admin/users/${id}/role`, {
+      method: 'PATCH',
+      body: JSON.stringify({ role }),
+    });
+  },
+
+  async updateAdminUserPassword(id: string, passwordPlan: string) {
+    return fetchApi(`/admin/users/${id}/password`, {
+      method: 'PATCH',
+      body: JSON.stringify({ password: passwordPlan }),
+    });
+  },
 };
 

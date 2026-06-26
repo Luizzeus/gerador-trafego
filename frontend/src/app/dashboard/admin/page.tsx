@@ -19,7 +19,8 @@ import {
   Check, 
   UserCheck, 
   UserX,
-  FileSpreadsheet
+  FileSpreadsheet,
+  X
 } from 'lucide-react';
 
 interface StatsData {
@@ -66,8 +67,17 @@ interface ConsentLogData {
   };
 }
 
+interface UserData {
+  id: string;
+  email: string;
+  role: string;
+  status: string;
+  createdAt: string;
+}
+
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<'stats' | 'profiles' | 'lgpd'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'profiles' | 'lgpd' | 'users'>('stats');
+  const [currentUser, setCurrentUser] = useState<{ id: string; email: string; role: string } | null>(null);
   
   // States for Stats
   const [stats, setStats] = useState<StatsData | null>(null);
@@ -88,6 +98,20 @@ export default function AdminDashboard() {
   const [logsError, setLogsError] = useState('');
   const [logSearch, setLogSearch] = useState('');
 
+  // States for User Management (super-admin only)
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [usersError, setUsersError] = useState('');
+  const [userSearch, setUserSearch] = useState('');
+
+  // Password modal states
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [selectedUserEmail, setSelectedUserEmail] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [updatingPassword, setUpdatingPassword] = useState(false);
+
   // UI States
   const [actionSuccess, setActionSuccess] = useState('');
   const [actionError, setActionError] = useState('');
@@ -95,6 +119,19 @@ export default function AdminDashboard() {
   const [copiedHashId, setCopiedHashId] = useState<string | null>(null);
 
   // Load Data
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const userStr = localStorage.getItem('medtraffic_user');
+      if (userStr) {
+        try {
+          setCurrentUser(JSON.parse(userStr));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }, []);
+
   const loadStats = async () => {
     setLoadingStats(true);
     setStatsError('');
@@ -134,6 +171,19 @@ export default function AdminDashboard() {
     }
   };
 
+  const loadUsers = async () => {
+    setLoadingUsers(true);
+    setUsersError('');
+    try {
+      const data = await api.getAdminUsers();
+      setUsers(data);
+    } catch (err: any) {
+      setUsersError(err.message || 'Falha ao carregar usuários.');
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 'stats') {
       loadStats();
@@ -141,6 +191,8 @@ export default function AdminDashboard() {
       loadProfiles();
     } else if (activeTab === 'lgpd') {
       loadConsentLogs();
+    } else if (activeTab === 'users') {
+      loadUsers();
     }
   }, [activeTab]);
 
@@ -173,6 +225,57 @@ export default function AdminDashboard() {
     setTimeout(() => setCopiedHashId(null), 2000);
   };
 
+  const handleToggleUserRole = async (id: string, currentRole: string) => {
+    setActionSuccess('');
+    setActionError('');
+    try {
+      const newRole = currentRole === 'admin' ? 'professional' : 'admin';
+      await api.updateAdminUserRole(id, newRole);
+      
+      // Update local state
+      setUsers((prev) =>
+        prev.map((u) => (u.id === id ? { ...u, role: newRole } : u))
+      );
+      
+      setActionSuccess(`Perfil do usuário atualizado para ${newRole === 'admin' ? 'Administrador' : 'Profissional'}!`);
+      setTimeout(() => setActionSuccess(''), 4000);
+    } catch (err: any) {
+      setActionError(err.message || 'Falha ao alterar perfil do usuário.');
+      setTimeout(() => setActionError(''), 4000);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newPassword.length < 6) {
+      setActionError('A senha deve conter no mínimo 6 caracteres.');
+      setTimeout(() => setActionError(''), 4000);
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setActionError('As senhas digitadas não batem.');
+      setTimeout(() => setActionError(''), 4000);
+      return;
+    }
+
+    setUpdatingPassword(true);
+    setActionSuccess('');
+    setActionError('');
+    try {
+      await api.updateAdminUserPassword(selectedUserId!, newPassword);
+      setActionSuccess(`Senha do usuário ${selectedUserEmail} atualizada com sucesso!`);
+      setShowPasswordModal(false);
+      setNewPassword('');
+      setConfirmPassword('');
+      setTimeout(() => setActionSuccess(''), 4000);
+    } catch (err: any) {
+      setActionError(err.message || 'Falha ao redefinir senha do usuário.');
+      setTimeout(() => setActionError(''), 4000);
+    } finally {
+      setUpdatingPassword(false);
+    }
+  };
+
   // Filters for Profiles
   const filteredProfiles = profiles.filter((p) => {
     const matchesSearch = 
@@ -189,6 +292,11 @@ export default function AdminDashboard() {
 
     return matchesSearch && matchesNiche && matchesStatus;
   });
+
+  // Filters for Users
+  const filteredUsers = users.filter((u) =>
+    u.email.toLowerCase().includes(userSearch.toLowerCase())
+  );
 
   // Filters for Consent Logs
   const filteredConsentLogs = consentLogs.filter((log) => {
@@ -254,6 +362,19 @@ export default function AdminDashboard() {
           <Lock className="h-4.5 w-4.5" />
           Auditoria LGPD
         </button>
+        {currentUser?.email === 'administrator' && (
+          <button
+            onClick={() => setActiveTab('users')}
+            className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none ${
+              activeTab === 'users'
+                ? 'border-clinical-500 text-teal-400 bg-clinical-500/5'
+                : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-900/40'
+            }`}
+          >
+            <Users className="h-4.5 w-4.5" />
+            Gestão de Usuários
+          </button>
+        )}
       </div>
 
       {/* TAB 1: VISÃO GERAL STATS */}
@@ -632,6 +753,183 @@ export default function AdminDashboard() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 4: GESTÃO DE USUÁRIOS (Super-Admin only) */}
+      {activeTab === 'users' && currentUser?.email === 'administrator' && (
+        <div className="space-y-6">
+          {/* Header Controls & Filters */}
+          <div className="flex flex-col md:flex-row gap-4 justify-between items-center bg-slate-900/30 p-4 border border-slate-900 rounded-2xl">
+            {/* Search Input */}
+            <div className="relative w-full md:w-80">
+              <Search className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-500" />
+              <input
+                type="text"
+                value={userSearch}
+                onChange={(e) => setUserSearch(e.target.value)}
+                placeholder="Buscar usuário por e-mail..."
+                className="w-full bg-slate-950/80 border border-slate-900 rounded-xl pl-10 pr-4 py-3 text-xs text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
+              />
+            </div>
+
+            <div className="text-[10px] text-slate-500 flex items-center gap-2">
+              <Lock className="h-4 w-4 text-teal-400" />
+              Painel de Administração de Contas (Super-Admin Root).
+            </div>
+          </div>
+
+          {/* Users Table */}
+          {loadingUsers ? (
+            <div className="h-[40vh] flex flex-col items-center justify-center text-slate-500 gap-3">
+              <RefreshCw className="w-8 h-8 animate-spin text-clinical-500" />
+              <span className="text-xs font-semibold uppercase tracking-wider">Carregando contas de usuários...</span>
+            </div>
+          ) : usersError ? (
+            <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-6 rounded-2xl flex items-center gap-3">
+              <AlertCircle className="h-6 w-6 text-red-400" />
+              <div>
+                <h4 className="font-bold text-sm">Falha ao listar usuários</h4>
+                <p className="text-xs text-red-400/80 mt-0.5">{usersError}</p>
+              </div>
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="bg-slate-900/10 border border-slate-900 border-dashed rounded-3xl p-12 text-center text-slate-500">
+              Nenhum usuário cadastrado correspondente aos filtros.
+            </div>
+          ) : (
+            <div className="bg-slate-900/20 border border-slate-900 rounded-3xl overflow-hidden shadow-xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-900 bg-slate-950/60">
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">E-mail / Username</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Cargo / Função</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status da Conta</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Criado Em</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-900 text-xs">
+                    {filteredUsers.map((u) => (
+                      <tr key={u.id} className="hover:bg-slate-900/35 transition-colors">
+                        <td className="px-6 py-4 font-mono text-slate-200">
+                          {u.email}
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-block px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wide ${
+                            u.role === 'admin' 
+                              ? 'bg-rose-500/15 text-rose-450 border border-rose-500/20' 
+                              : u.role === 'company_member'
+                              ? 'bg-sky-500/10 text-sky-400'
+                              : 'bg-teal-500/10 text-teal-400'
+                          }`}>
+                            {u.role === 'admin' ? 'Administrador' : u.role === 'company_member' ? 'Clínica' : 'Profissional'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center gap-1.5 text-slate-400">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                            {u.status === 'active' ? 'Ativo' : u.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-slate-400">
+                          {new Date(u.createdAt).toLocaleDateString('pt-BR')}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <div className="flex items-center justify-center gap-3">
+                            <button
+                              onClick={() => {
+                                setSelectedUserId(u.id);
+                                setSelectedUserEmail(u.email);
+                                setShowPasswordModal(true);
+                              }}
+                              className="px-3 py-1.5 rounded-lg text-[10px] font-bold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-750 transition-colors"
+                            >
+                              Alterar Senha
+                            </button>
+
+                            {u.email !== 'administrator' && (
+                              <button
+                                onClick={() => handleToggleUserRole(u.id, u.role)}
+                                className={`px-3 py-1.5 rounded-lg text-[10px] font-bold border transition-colors ${
+                                  u.role === 'admin'
+                                    ? 'bg-rose-500/10 border-rose-500/20 text-rose-400 hover:bg-rose-500/20'
+                                    : 'bg-clinical-500/10 border-clinical-500/20 text-teal-400 hover:bg-clinical-500/20'
+                                }`}
+                              >
+                                {u.role === 'admin' ? 'Rebaixar para Profissional' : 'Elevar a Administrador'}
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Password Change Modal */}
+      {showPasswordModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-md p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-slate-855">
+              <h3 className="font-extrabold text-sm text-white">Alterar Senha do Usuário</h3>
+              <button 
+                onClick={() => { setShowPasswordModal(false); setNewPassword(''); setConfirmPassword(''); }}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="space-y-1">
+              <span className="text-xs text-slate-400">Usuário selecionado:</span>
+              <strong className="block text-xs font-mono text-white">{selectedUserEmail}</strong>
+            </div>
+
+            <form onSubmit={handleChangePassword} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Nova Senha (Mínimo 6 caracteres)
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Digite a nova senha"
+                  className="w-full bg-slate-950/85 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                  Confirmar Nova Senha
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirme a nova senha"
+                  className="w-full bg-slate-950/85 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={updatingPassword}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-clinical-500 to-indigo-600 hover:from-clinical-600 hover:to-indigo-700 text-white font-bold text-xs uppercase tracking-wider shadow-lg transition-all flex items-center justify-center gap-2"
+              >
+                {updatingPassword ? <RefreshCw className="h-4 w-4 animate-spin" /> : 'Salvar Nova Senha'}
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </div>
