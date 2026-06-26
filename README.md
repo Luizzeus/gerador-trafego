@@ -146,6 +146,21 @@ Durante as iterações da Fase 2, as seguintes soluções foram desenhadas e imp
 
 ---
 
+## 🔑 Acesso Administrativo (Super-Admin)
+
+A partir da Fase 3/4, o acesso a privilégios administrativos foi restrito a uma única conta master (Super-Admin) autosemeada na inicialização do sistema:
+
+* **Username/E-mail de Login:** `Administrator`
+* **Senha:** `@ccessINC21*`
+
+### Recursos Exclusivos do Super-Admin:
+* **Gestão de Usuários:** Nova aba dedicada no painel administrativo (`/dashboard/admin`) visível unicamente para este usuário master.
+* **Redefinição de Senhas:** Capacidade de redefinir de forma forçada a senha de qualquer usuário da plataforma (criptografada via `bcrypt` no backend).
+* **Elevação de Cargos:** Capacidade de promover ou rebaixar usuários comuns (`professional` ou `company_member`) para cargo de administrador (`admin`) ou vice-versa.
+* **Segurança de Registro:** A rota pública de cadastro (`/register` e `/auth/register`) bloqueia qualquer tentativa de registrar usuários com papel `admin` ou com o nome reservado `administrator` para evitar escalabilidade de privilégios.
+
+---
+
 ## 🛠️ Stack Tecnológica
 
 ### Backend (API REST)
