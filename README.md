@@ -111,7 +111,8 @@ Durante a iteração da Fase 4, a seguinte solução de auto-ajuda e treinamento
    - **Modal de Passo a Passo Detalhado**: Clicar em qualquer guia de aprendizado abre um modal que exibe o manual detalhado com checklists enumerados e dicas de especialistas.
    - **FAQs Reativos**: Seção de perguntas frequentes estruturada em acordeões que respondem de imediato a dúvidas sobre domínios próprios, pagamentos e logs de terminal.
    - **Busca em Tempo Real**: Campo de pesquisa superior reativo que filtra instantaneamente as categorias de artigos e perguntas frequentes.
-   - **Assistente Virtual com Auto-scroll**: Widget chat simulado onde o usuário pode interagir com um bot de auto-ajuda, selecionando atalhos rápidos ou digitando dúvidas livremente. A barra de rolagem desliza de forma automática e suave até o final a cada nova mensagem.
+   - **Assistente Virtual com Digitação Humanizada**: Chatbot de suporte simulado que responde com um efeito de escrita em tempo real (palavra por palavra com intervalo de 45ms), barra de rolagem com auto-scroll reativo e bloqueio de inputs temporário enquanto o bot digita.
+   - **Filtro de Escopo e Respostas Enriquecidas**: O bot responde diretamente com instruções passo a passo para todos os tópicos de uso do MedTraffic e possui um detector que bloqueia perguntas de fora do contexto (off-topic), informando de forma polida seu foco exclusivo de suporte para a plataforma.
 
 ---
 
