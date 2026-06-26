@@ -29,6 +29,7 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **Editor Avançado de Blocos (Concluído):** Customização livre e visual de blocos de conteúdo da Landing Page (Hero, Benefícios e FAQs) com painel side-by-side de visualização em tempo real (Desktop/Mobile).
 * [x] **WhatsApp Automation (Concluído):** Disparador de notificações automáticas via WhatsApp (simulação Evolution API/Z-API) integrado ao CRM de Leads e à Agenda de Consultas.
 * [x] **Painel Administrativo Geral (RF-13 - Concluído):** Monitoramento de faturamento consolidado, aprovação e revogação ética de perfis profissionais (CRP/COREN autodeclarados) e auditoria legal global de consentimento LGPD.
+* [x] **Exportação de Dados do CRM (RF-14 - Concluído):** Exportação estruturada de leads e logs de consentimento da LGPD em formato CSV para backup, auditoria ou migração externa.
 
 ---
 
@@ -58,7 +59,12 @@ Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e imp
    - Tabela de verificação e aprovação/revogação ética de perfis profissionais autodeclarados (CRP/COREN) persistido diretamente no banco.
    - Auditoria global e detalhada de todos os consentimentos LGPD (IP, User Agent, hash criptográfico e termo aceito).
 
-5. **Arquitetura & Estrutura de Arquivos da Fase 3**:
+5. **Exportação de Leads do CRM (RF-14)**:
+   - Botão de exportação de dados na interface de CRM Kanban.
+   - Lógica de compilação de dados do lead, categorias e hash da LGPD convertendo em CSV com suporte a escape de aspas e codificação UTF-8.
+   - Fluxo de download seguro via Blob no lado do cliente Next.js.
+
+6. **Arquitetura & Estrutura de Arquivos da Fase 3**:
    - **Backend (NestJS):**
      * [appointment.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.service.ts) - Lógica de agendamento, controle de status, geração de link de reuniões e sincronização do Google Calendar.
      * [appointment.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.controller.ts) - Endpoints públicos e protegidos (JWT) de consulta, status, criação e credenciais.
@@ -70,11 +76,14 @@ Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e imp
      * [admin.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/admin/admin.service.ts) - Serviço para estatísticas consolidadas e auditorias do painel.
      * [admin.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/admin/admin.controller.ts) - Endpoints de estatísticas, perfis, verificação e logs.
      * [admin.module.ts](file:///c:/Projetos/Gerador-trafego/backend/src/admin/admin.module.ts) - Registro do módulo administrativo.
+     * [lead.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/lead/lead.controller.ts) - Rota `GET /leads/export` protegida.
+     * [lead.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/lead/lead.service.ts) - Lógica de formatação CSV do CRM.
    - **Frontend (Next.js):**
      * [agenda/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/agenda/page.tsx) - Painel administrativo da agenda e fluxo simulado do Google OAuth2.
      * [lp/[subdomain]/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/lp/%5Bsubdomain%5D/page.tsx) - Integração com o formulário de pré-agendamento e captação de leads.
      * [whatsapp/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/whatsapp/page.tsx) - Tela de automação de WhatsApp, pareamento QR e logs de disparos.
      * [admin/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/admin/page.tsx) - Painel geral de administração da plataforma.
+     * [crm/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/crm/page.tsx) - Botão e fluxo de download do CSV.
 
 ---
 
