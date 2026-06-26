@@ -32,6 +32,11 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **Exportação de Dados do CRM (RF-14 - Concluído):** Exportação estruturada de leads e logs de consentimento da LGPD em formato CSV para backup, auditoria ou migração externa.
 * [x] **Automação de Campanhas Direta (RF-15 - Concluído):** Publicação em tempo real com stepper visual de progresso e console/terminal de payloads JSON (Google Ads v16 e Meta Graph API v19.0) das campanhas lançadas.
 
+### 🟢 Fase 4: Central de Ajuda & Auto-Ajuda (Concluída)
+* [x] **Tutoriais e Guias de Tráfego:** Guias interativos integrados com passo a passo sobre conceitos de tráfego, configurações no Google Ads, limites éticos dos conselhos (CFP/CFM) e manuais do MedTraffic.
+* [x] **Busca Reativa:** Barra de pesquisa em tempo real que filtra dinamicamente todos os tópicos e perguntas frequentes.
+* [x] **Chatbot de Auto-Ajuda Simulado:** Assistente interativo que responde dúvidas com auto-scroll para leitura fluida de mensagens.
+
 ---
 
 ## 🚀 Implementações Recentes (Fase 3)
@@ -93,6 +98,20 @@ Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e imp
      * [crm/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/crm/page.tsx) - Botão e fluxo de download do CSV.
      * [campaigns/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/campaigns/page.tsx) - Integração com o stepper visual de publicação e modal de visualização de logs JSON de API com estilo terminal escuro.
      * [api.ts](file:///c:/Projetos/Gerador-trafego/frontend/src/lib/api.ts) - Integração com a função `getCampaignSyncLogs` para consumo da nova rota no backend.
+     * [help/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/help/page.tsx) - Tela da Central de Ajuda, contendo guias de tráfego, modal de passo a passo detalhado, FAQs reativos e assistente virtual de suporte.
+
+---
+
+## 🚀 Implementações Recentes (Fase 4)
+
+Durante a iteração da Fase 4, a seguinte solução de auto-ajuda e treinamento foi implementada com sucesso:
+
+1. **Central de Ajuda & Tutoriais de Tráfego**:
+   - **Guias Didáticos**: Artigos explicativos sobre os conceitos de Tráfego Orgânico vs. Pago, o funcionamento do leilão e orçamentos do Google Ads, e a adequação ética exigida pelo CFP e CFM/COFEN.
+   - **Modal de Passo a Passo Detalhado**: Clicar em qualquer guia de aprendizado abre um modal que exibe o manual detalhado com checklists enumerados e dicas de especialistas.
+   - **FAQs Reativos**: Seção de perguntas frequentes estruturada em acordeões que respondem de imediato a dúvidas sobre domínios próprios, pagamentos e logs de terminal.
+   - **Busca em Tempo Real**: Campo de pesquisa superior reativo que filtra instantaneamente as categorias de artigos e perguntas frequentes.
+   - **Assistente Virtual com Auto-scroll**: Widget chat simulado onde o usuário pode interagir com um bot de auto-ajuda, selecionando atalhos rápidos ou digitando dúvidas livremente. A barra de rolagem desliza de forma automática e suave até o final a cada nova mensagem.
 
 ---
 
