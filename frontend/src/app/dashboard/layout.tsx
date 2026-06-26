@@ -17,7 +17,9 @@ import {
   Megaphone,
   Calendar,
   ShieldCheck,
-  HelpCircle
+  HelpCircle,
+  Menu,
+  X
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -32,6 +34,7 @@ export default function DashboardLayout({
   const [userRole, setUserRole] = useState('');
   const [rawRole, setRawRole] = useState('');
   const [whatsappConnected, setWhatsappConnected] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem('medtraffic_token');
@@ -97,116 +100,162 @@ export default function DashboardLayout({
     menuItems.push({ name: 'Painel Admin', path: '/dashboard/admin', icon: ShieldCheck });
   }
 
+  // Helper to render the sidebar content to avoid duplication
+  const renderSidebarContent = () => (
+    <div className="flex flex-col justify-between h-full">
+      <div className="space-y-8">
+        
+        {/* Logo */}
+        <div 
+          className="flex items-center gap-3 cursor-pointer" 
+          onClick={() => {
+            router.push('/dashboard');
+            setIsSidebarOpen(false);
+          }}
+        >
+          <div className="bg-gradient-to-tr from-clinical-500 to-indigo-500 p-2 rounded-xl">
+            <Activity className="h-5 w-5 text-white" />
+          </div>
+          <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
+            MedTraffic
+          </span>
+        </div>
+
+        {/* Menu */}
+        <nav className="space-y-1 overflow-y-auto max-h-[60vh] pr-1 scrollbar-thin">
+          {menuItems.map((item) => {
+            const Icon = item.icon;
+            const isActive = pathname === item.path;
+            return (
+              <button
+                key={item.name}
+                onClick={() => {
+                  router.push(item.path);
+                  setIsSidebarOpen(false);
+                }}
+                className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 ${
+                  isActive 
+                    ? 'bg-clinical-500/10 text-teal-400 border border-clinical-500/20' 
+                    : 'text-slate-400 hover:text-white hover:bg-slate-900/60 border border-transparent'
+                }`}
+              >
+                <Icon className="h-5 w-5" />
+                {item.name}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      {/* User Card & Logout */}
+      <div className="space-y-4 pt-6 border-t border-slate-900">
+        
+        {/* WhatsApp Connection status indicator */}
+        <div className="bg-slate-900/40 border border-slate-900 p-3.5 rounded-2xl flex items-center gap-3">
+          <div className={`p-2 rounded-lg ${whatsappConnected ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
+            <MessageSquare className="h-4 w-4" />
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">WhatsApp Status</div>
+            {whatsappConnected ? (
+              <div className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 block animate-pulse" />
+                Conectado
+              </div>
+            ) : (
+              <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5 mt-0.5">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-700 block" />
+                Desconectado
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-3 px-2">
+          <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 font-bold uppercase text-sm">
+            {userName ? userName.slice(0, 2) : 'US'}
+          </div>
+          <div className="overflow-hidden">
+            <div className="text-xs font-bold text-white truncate">{userName}</div>
+            <div className="text-[10px] text-slate-500 truncate">{userRole}</div>
+          </div>
+        </div>
+
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/5 transition-all duration-200"
+        >
+          <LogOut className="h-4 w-4" />
+          Sair da Conta
+        </button>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex relative">
       
-      {/* Sidebar */}
-      <aside className="w-64 border-r border-slate-900 bg-slate-950 flex flex-col justify-between p-6 shrink-0 z-30">
-        <div className="space-y-8">
-          
-          {/* Logo */}
-          <div className="flex items-center gap-3 cursor-pointer" onClick={() => router.push('/dashboard')}>
-            <div className="bg-gradient-to-tr from-clinical-500 to-indigo-500 p-2 rounded-xl">
-              <Activity className="h-5 w-5 text-white" />
-            </div>
-            <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-teal-400 to-indigo-400 bg-clip-text text-transparent">
-              MedTraffic
-            </span>
-          </div>
-  
-          {/* Menu */}
-          <nav className="space-y-1">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.path;
-              return (
-                <button
-                  key={item.name}
-                  onClick={() => router.push(item.path)}
-                  className={`w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl text-sm font-semibold tracking-wide transition-all duration-200 ${
-                    isActive 
-                      ? 'bg-clinical-500/10 text-teal-400 border border-clinical-500/20' 
-                      : 'text-slate-400 hover:text-white hover:bg-slate-900/60 border border-transparent'
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  {item.name}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-  
-        {/* User Card & Logout */}
-        <div className="space-y-4 pt-6 border-t border-slate-900">
-          
-          {/* WhatsApp Connection status indicator */}
-          <div className="bg-slate-900/40 border border-slate-900 p-3.5 rounded-2xl flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${whatsappConnected ? 'bg-emerald-500/15 text-emerald-400' : 'bg-slate-800 text-slate-500'}`}>
-              <MessageSquare className="h-4 w-4" />
-            </div>
-            <div>
-              <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">WhatsApp Status</div>
-              {whatsappConnected ? (
-                <div className="text-[11px] font-bold text-emerald-400 flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 block animate-pulse" />
-                  Conectado
-                </div>
-              ) : (
-                <div className="text-[11px] font-bold text-slate-500 flex items-center gap-1.5 mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-700 block" />
-                  Desconectado
-                </div>
-              )}
-            </div>
-          </div>
-  
-          <div className="flex items-center gap-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-300 font-bold uppercase text-sm">
-              {userName ? userName.slice(0, 2) : 'US'}
-            </div>
-            <div className="overflow-hidden">
-              <div className="text-xs font-bold text-white truncate">{userName}</div>
-              <div className="text-[10px] text-slate-500 truncate">{userRole}</div>
-            </div>
-          </div>
-  
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/5 transition-all duration-200"
-          >
-            <LogOut className="h-4 w-4" />
-            Sair da Conta
-          </button>
-        </div>
+      {/* Sidebar for Desktop */}
+      <aside className="w-64 border-r border-slate-900 bg-slate-950 flex-col justify-between p-6 shrink-0 z-35 lg:flex hidden">
+        {renderSidebarContent()}
       </aside>
+
+      {/* Sidebar Overlay/Drawer for Mobile/Tablet */}
+      {isSidebarOpen && (
+        <div className="lg:hidden fixed inset-0 z-50 flex">
+          {/* Backdrop overlay */}
+          <div 
+            className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm transition-opacity duration-300"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+          {/* Drawer container */}
+          <aside className="relative w-64 bg-slate-950 border-r border-slate-900 flex flex-col justify-between p-6 z-50 h-full animate-slideIn">
+            <button
+              onClick={() => setIsSidebarOpen(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white p-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            {renderSidebarContent()}
+          </aside>
+        </div>
+      )}
   
       {/* Main Content Area */}
-      <div className="flex-grow flex flex-col overflow-y-auto max-h-screen">
+      <div className="flex-grow flex flex-col overflow-y-auto max-h-screen w-full">
         
         {/* Top Header */}
-        <header className="border-b border-slate-900 px-8 py-5 flex items-center justify-between shrink-0">
-          <h2 className="font-extrabold text-lg tracking-tight text-white uppercase">
-            {pathname === '/dashboard' ? 'Geral' : 
-             pathname === '/dashboard/landing-pages' ? 'Páginas de Captura' : 
-             pathname === '/dashboard/crm' ? 'CRM Funil de Leads' : 
-             pathname === '/dashboard/content' ? 'Sugestões de Tráfego & IA' : 
-             pathname === '/dashboard/campaigns' ? 'Campanhas de Anúncios' : 
-             pathname === '/dashboard/agenda' ? 'Agenda de Consultas' : 
-             pathname === '/dashboard/billing' ? 'Assinatura e Planos' : 
-             pathname === '/dashboard/admin' ? 'Painel Admin' : 
-             pathname === '/dashboard/help' ? 'Central de Ajuda' : 
-             pathname === '/dashboard/profile' ? 'Configuração de Perfil' : 'Painel'}
-          </h2>
-
+        <header className="border-b border-slate-900 px-6 lg:px-8 py-5 flex items-center justify-between shrink-0 gap-4">
+          <div className="flex items-center gap-3">
+            {/* Hamburger Button */}
+            <button
+              onClick={() => setIsSidebarOpen(true)}
+              className="lg:hidden text-slate-400 hover:text-white p-2 rounded-xl bg-slate-900 border border-slate-800 hover:bg-slate-800 transition-colors"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+            
+            <h2 className="font-extrabold text-sm lg:text-lg tracking-tight text-white uppercase truncate max-w-[160px] md:max-w-none">
+              {pathname === '/dashboard' ? 'Geral' : 
+               pathname === '/dashboard/landing-pages' ? 'Páginas de Captura' : 
+               pathname === '/dashboard/crm' ? 'CRM Funil de Leads' : 
+               pathname === '/dashboard/content' ? 'Sugestões de Tráfego & IA' : 
+               pathname === '/dashboard/campaigns' ? 'Campanhas de Anúncios' : 
+               pathname === '/dashboard/agenda' ? 'Agenda de Consultas' : 
+               pathname === '/dashboard/billing' ? 'Assinatura e Planos' : 
+               pathname === '/dashboard/admin' ? 'Painel Admin' : 
+               pathname === '/dashboard/help' ? 'Central de Ajuda' : 
+               pathname === '/dashboard/profile' ? 'Configuração de Perfil' : 'Painel'}
+            </h2>
+          </div>
           
-          <div className="flex items-center gap-4 text-xs font-semibold text-slate-400 bg-slate-900/40 border border-slate-900 px-4 py-2 rounded-xl">
-            Ambiente Local: <span className="text-clinical-500 font-bold">SQLite (Ativo)</span>
+          <div className="flex items-center gap-2 text-[9px] md:text-xs font-semibold text-slate-400 bg-slate-900/40 border border-slate-900 px-3 py-1.5 md:px-4 md:py-2 rounded-xl shrink-0">
+            Ambiente Local: <span className="text-clinical-500 font-bold">SQLite</span>
           </div>
         </header>
-
+ 
         {/* Content Wrapper */}
-        <main className="flex-grow p-8">
+        <main className="flex-grow p-4 md:p-6 lg:p-8">
           {children}
         </main>
       </div>

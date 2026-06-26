@@ -328,10 +328,10 @@ export default function AdminDashboard() {
       )}
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-slate-900 gap-2 overflow-x-auto pb-0.5">
+      <div className="flex border-b border-slate-900 gap-2 overflow-x-auto pb-0.5 scrollbar-thin">
         <button
           onClick={() => setActiveTab('stats')}
-          className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none ${
+          className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none shrink-0 ${
             activeTab === 'stats'
               ? 'border-clinical-500 text-teal-400 bg-clinical-500/5'
               : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-900/40'
@@ -342,7 +342,7 @@ export default function AdminDashboard() {
         </button>
         <button
           onClick={() => setActiveTab('profiles')}
-          className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none ${
+          className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none shrink-0 ${
             activeTab === 'profiles'
               ? 'border-clinical-500 text-teal-400 bg-clinical-500/5'
               : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-900/40'
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
         </button>
         <button
           onClick={() => setActiveTab('lgpd')}
-          className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none ${
+          className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none shrink-0 ${
             activeTab === 'lgpd'
               ? 'border-clinical-500 text-teal-400 bg-clinical-500/5'
               : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-900/40'
@@ -365,7 +365,7 @@ export default function AdminDashboard() {
         {currentUser?.email === 'administrator' && (
           <button
             onClick={() => setActiveTab('users')}
-            className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none ${
+            className={`flex items-center gap-2.5 px-6 py-4 text-sm font-bold tracking-wide uppercase transition-all duration-200 border-b-2 outline-none shrink-0 ${
               activeTab === 'users'
                 ? 'border-clinical-500 text-teal-400 bg-clinical-500/5'
                 : 'border-transparent text-slate-400 hover:text-white hover:bg-slate-900/40'
@@ -527,7 +527,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Filter selectors */}
-            <div className="flex gap-3 w-full md:w-auto">
+            <div className="grid grid-cols-2 md:flex gap-3 w-full md:w-auto">
               <select
                 value={profileNicheFilter}
                 onChange={(e) => setProfileNicheFilter(e.target.value)}
@@ -574,22 +574,22 @@ export default function AdminDashboard() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-900 bg-slate-950/60">
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Profissional</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Atuação / Niche</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">CRP / COREN</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Cidade & Estado</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Verificado</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">Ações</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Profissional</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Atuação / Niche</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">CRP / COREN</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Cidade & Estado</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Verificado</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center whitespace-nowrap">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-900">
                     {filteredProfiles.map((profile) => (
                       <tr key={profile.id} className="hover:bg-slate-900/35 transition-colors">
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-xs font-bold text-white">{profile.fullName}</div>
                           <div className="text-[10px] text-slate-500 mt-0.5">{profile.user.email}</div>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wide ${
                             profile.niche === 'psychologist' 
                               ? 'bg-teal-500/10 text-teal-400' 
@@ -598,14 +598,14 @@ export default function AdminDashboard() {
                             {profile.niche === 'psychologist' ? 'Psicólogo' : 'Cuidador'}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="text-xs font-bold text-slate-300">{profile.registerNumber}</div>
                           <div className="text-[9px] text-slate-500 mt-0.5 uppercase">Reg: {profile.registerState}</div>
                         </td>
-                        <td className="px-6 py-4 text-xs text-slate-400">
+                        <td className="px-6 py-4 text-xs text-slate-400 whitespace-nowrap">
                           {profile.addressCity} / {profile.addressState}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           {profile.isVerified ? (
                             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-emerald-500/15 text-emerald-400 text-[10px] font-bold">
                               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -618,7 +618,7 @@ export default function AdminDashboard() {
                             </span>
                           )}
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-6 py-4 text-center whitespace-nowrap">
                           <button
                             onClick={() => handleVerifyProfile(profile.id, profile.isVerified)}
                             disabled={updatingProfileId === profile.id}
@@ -700,32 +700,32 @@ export default function AdminDashboard() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-900 bg-slate-950/60">
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Lead</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Endereço IP</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Data Aceite</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Texto Declarado</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Hash SHA-256 (Auditoria)</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Lead</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Endereço IP</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Data Aceite</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Texto Declarado</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Hash SHA-256 (Auditoria)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-900 text-xs">
                     {filteredConsentLogs.map((log) => (
                       <tr key={log.id} className="hover:bg-slate-900/35 transition-colors">
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="font-bold text-white">{log.lead.name}</div>
                           <div className="text-[10px] text-slate-500 mt-0.5">
                             {log.lead.email || 'Sem e-mail'} | {log.lead.phone}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-slate-400 font-mono">
+                        <td className="px-6 py-4 text-slate-400 font-mono whitespace-nowrap">
                           {log.ipAddress}
                         </td>
-                        <td className="px-6 py-4 text-slate-400">
+                        <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
                           {new Date(log.acceptedAt).toLocaleString('pt-BR')}
                         </td>
-                        <td className="px-6 py-4 max-w-xs truncate text-slate-500" title={log.consentText}>
+                        <td className="px-6 py-4 max-w-xs truncate text-slate-500 whitespace-nowrap" title={log.consentText}>
                           {log.consentText}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center gap-2">
                             <span 
                               className="font-mono text-[10px] text-slate-400 bg-slate-950 px-2 py-1 rounded border border-slate-900 max-w-[120px] truncate cursor-pointer hover:text-white"
@@ -803,20 +803,20 @@ export default function AdminDashboard() {
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="border-b border-slate-900 bg-slate-950/60">
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">E-mail / Username</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Cargo / Função</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Status da Conta</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500">Criado Em</th>
-                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center">Ações</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">E-mail / Username</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Cargo / Função</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Status da Conta</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 whitespace-nowrap">Criado Em</th>
+                      <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-slate-500 text-center whitespace-nowrap">Ações</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-900 text-xs">
                     {filteredUsers.map((u) => (
                       <tr key={u.id} className="hover:bg-slate-900/35 transition-colors">
-                        <td className="px-6 py-4 font-mono text-slate-200">
+                        <td className="px-6 py-4 font-mono text-slate-200 whitespace-nowrap">
                           {u.email}
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`inline-block px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wide ${
                             u.role === 'admin' 
                               ? 'bg-rose-500/15 text-rose-450 border border-rose-500/20' 
@@ -827,16 +827,16 @@ export default function AdminDashboard() {
                             {u.role === 'admin' ? 'Administrador' : u.role === 'company_member' ? 'Clínica' : 'Profissional'}
                           </span>
                         </td>
-                        <td className="px-6 py-4">
+                        <td className="px-6 py-4 whitespace-nowrap">
                           <span className="inline-flex items-center gap-1.5 text-slate-400">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             {u.status === 'active' ? 'Ativo' : u.status}
                           </span>
                         </td>
-                        <td className="px-6 py-4 text-slate-400">
+                        <td className="px-6 py-4 text-slate-400 whitespace-nowrap">
                           {new Date(u.createdAt).toLocaleDateString('pt-BR')}
                         </td>
-                        <td className="px-6 py-4 text-center">
+                        <td className="px-6 py-4 text-center whitespace-nowrap">
                           <div className="flex items-center justify-center gap-3">
                             <button
                               onClick={() => {
