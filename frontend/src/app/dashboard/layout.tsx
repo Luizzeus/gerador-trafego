@@ -16,7 +16,8 @@ import {
   CreditCard,
   Megaphone,
   Calendar,
-  ShieldCheck
+  ShieldCheck,
+  HelpCircle
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -89,6 +90,7 @@ export default function DashboardLayout({
     { name: 'Automação WhatsApp', path: '/dashboard/whatsapp', icon: MessageSquare },
     { name: 'Assinatura e Planos', path: '/dashboard/billing', icon: CreditCard },
     { name: 'Perfil Profissional', path: '/dashboard/profile', icon: UserCircle },
+    { name: 'Central de Ajuda', path: '/dashboard/help', icon: HelpCircle },
   ];
 
   if (rawRole === 'admin') {
@@ -193,6 +195,7 @@ export default function DashboardLayout({
              pathname === '/dashboard/agenda' ? 'Agenda de Consultas' : 
              pathname === '/dashboard/billing' ? 'Assinatura e Planos' : 
              pathname === '/dashboard/admin' ? 'Painel Admin' : 
+             pathname === '/dashboard/help' ? 'Central de Ajuda' : 
              pathname === '/dashboard/profile' ? 'Configuração de Perfil' : 'Painel'}
           </h2>
 
