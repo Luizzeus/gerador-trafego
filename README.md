@@ -36,6 +36,8 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **Tutoriais e Guias de Tráfego:** Guias interativos integrados com passo a passo sobre conceitos de tráfego, configurações no Google Ads, limites éticos dos conselhos (CFP/CFM) e manuais do MedTraffic.
 * [x] **Busca Reativa:** Barra de pesquisa em tempo real que filtra dinamicamente todos os tópicos e perguntas frequentes.
 * [x] **Chatbot de Auto-Ajuda Simulado:** Assistente interativo que responde dúvidas com auto-scroll para leitura fluida de mensagens.
+* [x] **Melhorias na Landing Page Principal:** Seção "Nichos Atendidos" customizada para profissionais de saúde com foco em atendimento/acompanhamento, seção "Como Funciona" estruturada e vinculada aos guias.
+* [x] **Simulador de Demonstração em Vídeo:** Modal de player interativo com controles completos (play, pause, timeline, velocidade, volume) e demonstração animada em 4 fases do fluxo da plataforma MedTraffic.
 
 ---
 
@@ -113,6 +115,11 @@ Durante a iteração da Fase 4, a seguinte solução de auto-ajuda e treinamento
    - **Busca em Tempo Real**: Campo de pesquisa superior reativo que filtra instantaneamente as categorias de artigos e perguntas frequentes.
    - **Assistente Virtual com Digitação Humanizada**: Chatbot de suporte simulado que responde com um efeito de escrita em tempo real (palavra por palavra com intervalo de 45ms), barra de rolagem com auto-scroll reativo e bloqueio de inputs temporário enquanto o bot digita.
    - **Filtro de Escopo e Respostas Enriquecidas**: O bot responde diretamente com instruções passo a passo para todos os tópicos de uso do MedTraffic e possui um detector que bloqueia perguntas de fora do contexto (off-topic), informando de forma polida seu foco exclusivo de suporte para a plataforma.
+
+2. **Melhorias na Landing Page Principal & Simulador de Vídeo de Demonstração**:
+   - **Seção Nichos Atendidos (`#nichos`)**: Exposição visualmente aprimorada de cards para Psicólogos, Cuidadores, Médicos e Fisioterapeutas, deixando explícito que a plataforma atende profissionais de saúde que prestam atendimento clínico e acompanhamento de pacientes.
+   - **Seção Como Funciona (`#processos`)**: Apresentação de uma linha do tempo sequencial e interativa detalhando o fluxo completo do sistema, com links rápidos de navegação.
+   - **Simulador de Vídeo Interativo (DemoModal)**: Modal do tipo player que exibe uma demonstração autônoma animada da plataforma MedTraffic rodando em 4 etapas (edição de LP, higienização ética de IA, pareamento do WhatsApp e monitoramento de CRM com Google Meet), incluindo botões de Play/Pause, velocidade, mute e timeline clicável.
 
 ---
 
