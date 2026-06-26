@@ -55,6 +55,7 @@ export default function HelpCenterPage() {
     { sender: 'bot', text: 'Olá! Sou o Assistente Virtual do MedTraffic. Selecione uma das dúvidas comuns abaixo ou digite algo no campo para que eu possa te ajudar imediatamente!' }
   ]);
   const [chatInput, setChatInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     if (chatContainerRef.current) {
@@ -217,13 +218,78 @@ export default function HelpCenterPage() {
     }
   ], []);
 
+  // Base de respostas detalhadas do assistente virtual
+  const chatbotResponses = useMemo(() => [
+    {
+      keywords: ['whatsapp', 'zap', 'evolution', 'z-api', 'qr code', 'conectar celular', 'parear', 'instancia', 'instância'],
+      answer: 'Para configurar e conectar seu WhatsApp no MedTraffic:\n\n' +
+        '1. Acesse o menu "Automação WhatsApp" no painel lateral esquerdo.\n' +
+        '2. Digite um nome para a sua instância (ex: "Consultório Ana") e selecione o provedor (Evolution API ou Z-API).\n' +
+        '3. Clique em "Gerar Instância & Conectar". O sistema criará as credenciais e exibirá um QR Code.\n' +
+        '4. Abra o WhatsApp no seu smartphone, acesse "Aparelhos Conectados" e clique em "Conectar um Aparelho".\n' +
+        '5. Escaneie o QR Code na tela. O status mudará imediatamente para "Conectado (verde)".\n' +
+        '6. Ative os switches para habilitar disparos automáticos de boas-vindas para novos leads, confirmações de consulta e avisos de cancelamento.'
+    },
+    {
+      keywords: ['lgpd', 'consent', 'consentlog', 'privacidade', 'segurança', 'hash', 'sha256', 'lei geral'],
+      answer: 'O ConsentLog é o registro que garante a segurança jurídica do seu consultório perante a LGPD:\n\n' +
+        '1. Quando um visitante preenche o formulário da sua Landing Page, ele precisa marcar obrigatoriamente a caixa de aceitação dos termos de privacidade.\n' +
+        '2. O MedTraffic cria um log inalterável no banco de dados contendo o endereço IP do lead, o navegador/dispositivo, data/hora e gera um Hash SHA-256 criptográfico único.\n' +
+        '3. Esse Hash comprova legalmente que o lead consentiu com o contato comercial.\n' +
+        '4. Você pode exportar ou consultar esses dados a qualquer momento na aba do CRM Kanban clicando em "Exportar Leads" ou acessando o Painel Admin.'
+    },
+    {
+      keywords: ['agenda', 'sincronizar', 'conectar google', 'meet', 'google agenda', 'calendar', 'consulta', 'calendario', 'reunião', 'compromisso'],
+      answer: 'Para sincronizar sua agenda com o Google Calendar e gerar salas do Google Meet:\n\n' +
+        '1. Vá na aba "Agenda de Consultas" no menu lateral.\n' +
+        '2. No painel superior, clique no botão "Conectar Google Agenda".\n' +
+        '3. Faça o login na conta do Google pelo modal de consentimento simulado e autorize o acesso.\n' +
+        '4. Com o status "Conectado", os agendamentos feitos pelos leads na sua Landing Page aparecerão na aba de Pendentes.\n' +
+        '5. Ao clicar em "Confirmar Consulta", o MedTraffic cria o evento automaticamente na sua agenda e gera um link exclusivo do Google Meet.'
+    },
+    {
+      keywords: ['rejeitado', 'reprovado', 'bloqueado', 'anúncio', 'anuncio', 'ads', 'google ads', 'meta ads', 'política', 'diretriz', 'ética', 'etica', 'cfp', 'cfm', 'coren', 'conselho', 'proibido'],
+      answer: 'Se o seu anúncio foi rejeitado ou você quer evitar bloqueios dos conselhos de saúde (CFP/CFM):\n\n' +
+        '1. Não prometa resultados garantidos (como "cura garantida" ou "elimine a ansiedade em 3 sessões").\n' +
+        '2. Não anuncie preços ou descontos promocionais como barganha comercial.\n' +
+        '3. Exiba seu registro profissional (CRP/COREN/CFM) e estado visivelmente (o MedTraffic faz isso automaticamente no rodapé da Landing Page).\n' +
+        '4. Utilize as Sugestões de Copy de IA do MedTraffic. Nossa inteligência artificial possui um filtro semântico de guardrail ético que higieniza e substitui termos agressivos por linguagem informativa e acolhedora.'
+    },
+    {
+      keywords: ['landing page', 'criar pagina', 'editar pagina', 'subdominio', 'dominio', 'cname', 'customizar', 'editor', 'bloco', 'headline', 'faq', 'beneficios', 'template', 'layout'],
+      answer: 'Como gerenciar suas Landing Pages (páginas de captura):\n\n' +
+        '1. Acesse "Páginas de Captura" no menu lateral.\n' +
+        '2. Clique em "Criar Nova Página" para escolher um template do seu nicho (psicólogo ou cuidador) e registrar um subdomínio (ex: ana-psico).\n' +
+        '3. Clique em "Editar Conteúdo" no card da página para acessar o editor visual side-by-side.\n' +
+        '4. No painel esquerdo, customize headlines, subheadlines, adicione ou remova itens de Benefícios e Perguntas Frequentes (FAQ).\n' +
+        '5. No painel direito, visualize o design da página e alterne entre a visualização desktop e mobile para conferir a responsividade antes de salvar.'
+    },
+    {
+      keywords: ['crm', 'kanban', 'funil', 'leads', 'leads_export', 'exportar', 'csv', 'backup', 'baixar planilha', 'planilha'],
+      answer: 'O CRM Kanban do MedTraffic ajuda a gerenciar os leads recebidos:\n\n' +
+        '1. Visualização: Seus leads ficam organizados em colunas (Novo, Em Contato, Agendado, Convertido, Perdido).\n' +
+        '2. Movimentação: Mova os cartões por arrastar-e-soltar de acordo com a etapa de negociação.\n' +
+        '3. Contato: Clique no ícone de WhatsApp no card do lead para iniciar um chat imediatamente no celular.\n' +
+        '4. Exportação: Clique no botão "Exportar Leads" no topo direito do Kanban para baixar uma planilha CSV contendo todos os dados e logs de consentimento da LGPD.'
+    },
+    {
+      keywords: ['faturamento', 'assinar', 'plano', 'mensalidade', 'pagar', 'pagamento', 'pix', 'recebido', 'nfse', 'nfs-e', 'nota fiscal', 'asaas', 'recibo'],
+      answer: 'Sobre assinaturas e faturamento no MedTraffic:\n\n' +
+        '1. Acesse a aba "Assinatura e Planos" para visualizar seu status ativo ou inativo.\n' +
+        '2. Escolha entre os planos Profissional ou Premium e clique em "Assinar Plano".\n' +
+        '3. O sistema gerará um QR Code PIX e chave copia e cola do gateway Asaas.\n' +
+        '4. Em ambiente de desenvolvimento local, clique no botão "Confirmar Pagamento (Simulação)" para ativar sua conta.\n' +
+        '5. O status mudará para "Assinatura Ativa" e as faturas pagas estarão disponíveis na tabela abaixo, com links diretos para visualização fictícia da NFS-e.'
+    }
+  ], []);
+
   // Dúvidas comuns para o Chatbot Simulado
-  const chatbotPrompts = [
-    { q: 'Como configuro meu WhatsApp?', a: 'Para configurar seu WhatsApp:\n1. Vá na aba "Automação WhatsApp" no menu lateral.\n2. Insira um nome de identificação e escolha o provedor.\n3. Clique em "Gerar Instância & Conectar" para abrir o QR Code.\n4. No seu celular, abra o WhatsApp, acesse "Aparelhos Conectados" > "Conectar um Aparelho" e escaneie o código na tela.\n5. O status mudará imediatamente para "Conectado" (verde) tanto na tela quanto na sidebar.' },
-    { q: 'Por que meu anúncio foi rejeitado?', a: 'As principais causas de rejeição de anúncios na área de saúde são:\n1. Falta do número de registro (CRP/COREN) visível na Landing Page.\n2. Prometer resultados clínicos ou curas imediatas.\n3. Uso de termos proibidos pelo conselho.\n4. Imagens inadequadas.\n\nPara corrigir, preencha os dados do conselho no seu perfil e use a IA de sugestões do MedTraffic que possui guardrails automáticos.' },
-    { q: 'O que é o ConsentLog da LGPD?', a: 'O ConsentLog é uma evidência digital obrigatória. Ele salva:\n1. O endereço IP do visitante.\n2. O navegador/dispositivo utilizado.\n3. O termo de consentimento aceito.\n4. Um Hash SHA-256 criptográfico inalterável.\n\nIsso protege você juridicamente contra multas da ANPD e comprova que o lead autorizou o contato pelo WhatsApp.' },
-    { q: 'Como sincronizo minha agenda?', a: 'Siga este passo a passo para a agenda:\n1. Acesse "Agenda de Consultas" no menu esquerdo.\n2. No banner superior, clique em "Conectar Google Agenda".\n3. Realize o login no pop-up OAuth simulado para autorizar o vínculo.\n4. Ao receber novos agendamentos da Landing Page (na aba Pendentes), clique em "Confirmar Consulta".\n5. O MedTraffic gerará automaticamente o evento na sua agenda física e criará o link do Google Meet.' }
-  ];
+  const chatbotPrompts = useMemo(() => [
+    { q: 'Como configuro meu WhatsApp?', a: chatbotResponses[0].answer },
+    { q: 'Por que meu anúncio foi rejeitado?', a: chatbotResponses[3].answer },
+    { q: 'O que é o ConsentLog da LGPD?', a: chatbotResponses[1].answer },
+    { q: 'Como sincronizo minha agenda?', a: chatbotResponses[2].answer }
+  ], [chatbotResponses]);
 
   // Filtros aplicados
   const filteredArticles = useMemo(() => {
@@ -247,36 +313,90 @@ export default function HelpCenterPage() {
     });
   }, [faqs, activeTab, searchQuery]);
 
+  // Função para retornar a resposta apropriada com base na pergunta
+  const getBotResponse = (query: string): string => {
+    const cleanQuery = query.toLowerCase().trim();
+
+    // 1. Procurar correspondência de palavra-chave na nossa base enriquecida
+    for (const item of chatbotResponses) {
+      if (item.keywords.some(kw => cleanQuery.includes(kw))) {
+        return item.answer;
+      }
+    }
+
+    // 2. Verificar se a pergunta tem algum contexto relevante à plataforma
+    const platformTerms = [
+      'medtraffic', 'plataforma', 'sistema', 'site', 'página', 'anuncio', 'anúncio', 'ads', 'campanha',
+      'lead', 'contato', 'crm', 'kanban', 'agenda', 'calendar', 'google', 'meet', 'whatsapp', 'zap',
+      'evolution', 'z-api', 'qr code', 'conectar', 'sincronizar', 'faturamento', 'pagamento', 'pix',
+      'plano', 'assinatura', 'perfil', 'registro', 'crp', 'coren', 'cfm', 'ética', 'etica', 'lgpd',
+      'consentlog', 'hash', 'exportar', 'csv', 'editor', 'landing page', 'lp', 'como faço', 'ajuda', 'tutorial'
+    ];
+
+    const hasPlatformContext = platformTerms.some(term => cleanQuery.includes(term));
+
+    if (hasPlatformContext) {
+      return 'Entendi que você está buscando ajuda com a plataforma MedTraffic. Para que eu possa te responder detalhadamente, por favor faça uma pergunta específica sobre um dos seguintes recursos:\n\n' +
+        '• WhatsApp (QR Code, conexão, instâncias)\n' +
+        '• Google Agenda & Meet (sincronização e videoconferências)\n' +
+        '• Landing Pages (criação, edição e domínio personalizado)\n' +
+        '• CRM Funil de Leads & LGPD (ConsentLog e exportação CSV)\n' +
+        '• Campanhas de Anúncios (Google Ads, Meta Ads e ética CFP/CFM)\n' +
+        '• Assinaturas (Planos, faturas e simulação PIX)';
+    }
+
+    // 3. Resposta de fora do escopo (off-topic disclaimer)
+    return 'Peço desculpas! Minha função é estritamente voltada para esclarecer dúvidas sobre o uso da plataforma MedTraffic e conceitos de tráfego digital para profissionais de saúde.\n\n' +
+      'Não posso responder a perguntas sobre outros assuntos fora deste escopo. Como posso ajudar você com o MedTraffic hoje?';
+  };
+
+  // Efeito de digitação suave palavra por palavra
+  const triggerBotResponse = (response: string) => {
+    setIsTyping(true);
+    
+    // Adiciona a mensagem inicial vazia do bot
+    setChatHistory(prev => [...prev, { sender: 'bot', text: '' }]);
+    
+    let currentText = '';
+    const words = response.split(' ');
+    let index = 0;
+    
+    const interval = setInterval(() => {
+      if (index < words.length) {
+        currentText += (index === 0 ? '' : ' ') + words[index];
+        setChatHistory(prev => {
+          const copy = [...prev];
+          copy[copy.length - 1] = { sender: 'bot', text: currentText };
+          return copy;
+        });
+        index++;
+      } else {
+        clearInterval(interval);
+        setIsTyping(false);
+      }
+    }, 45); // 45ms por palavra: efeito rápido, humanizado e extremamente fluido!
+  };
+
   const handlePromptClick = (question: string, answer: string) => {
+    if (isTyping) return;
     setChatHistory(prev => [
       ...prev,
-      { sender: 'user', text: question },
-      { sender: 'bot', text: answer }
+      { sender: 'user', text: question }
     ]);
+    triggerBotResponse(answer);
   };
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || isTyping) return;
 
     const userText = chatInput;
     setChatInput('');
 
     setChatHistory(prev => [...prev, { sender: 'user', text: userText }]);
 
-    setTimeout(() => {
-      const match = chatbotPrompts.find(p => 
-        userText.toLowerCase().includes(p.q.toLowerCase()) || 
-        p.q.toLowerCase().includes(userText.toLowerCase()) ||
-        userText.toLowerCase().split(' ').some(word => word.length > 3 && p.q.toLowerCase().includes(word))
-      );
-
-      const botResponse = match 
-        ? match.a 
-        : `Entendi a sua dúvida sobre "${userText}". Para este caso específico, recomendo consultar os artigos nas abas da Central de Ajuda ou verificar as etapas do manual detalhado clicando nos cartões de guias de aprendizado.`;
-
-      setChatHistory(prev => [...prev, { sender: 'bot', text: botResponse }]);
-    }, 400);
+    const response = getBotResponse(userText);
+    triggerBotResponse(response);
   };
 
   const toggleFaq = (id: string) => {
@@ -526,7 +646,8 @@ export default function HelpCenterPage() {
                   <button
                     key={idx}
                     onClick={() => handlePromptClick(p.q, p.a)}
-                    className="text-[9px] font-bold bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-800 text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-lg transition-all duration-150 text-left"
+                    disabled={isTyping}
+                    className="text-[9px] font-bold bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-800 text-slate-400 hover:text-slate-200 px-2.5 py-1.5 rounded-lg transition-all duration-150 text-left disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {p.q}
                   </button>
@@ -538,14 +659,16 @@ export default function HelpCenterPage() {
             <form onSubmit={handleSendChat} className="flex gap-2 border-t border-slate-900 pt-4 shrink-0 z-10">
               <input
                 type="text"
-                placeholder="Pergunte ao assistente..."
+                placeholder={isTyping ? "Digitando resposta..." : "Pergunte ao assistente..."}
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                className="flex-grow bg-slate-950 border border-slate-900 focus:border-clinical-500/30 rounded-xl px-3.5 py-2.5 text-[11px] outline-none text-slate-200"
+                disabled={isTyping}
+                className="flex-grow bg-slate-950 border border-slate-900 focus:border-clinical-500/30 rounded-xl px-3.5 py-2.5 text-[11px] outline-none text-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
               />
               <button
                 type="submit"
-                className="bg-clinical-500 hover:bg-clinical-600 text-white p-2.5 rounded-xl transition-all duration-200"
+                disabled={isTyping}
+                className="bg-clinical-500 hover:bg-clinical-600 text-white p-2.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="h-4 w-4" />
               </button>
