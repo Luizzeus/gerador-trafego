@@ -262,5 +262,9 @@ export const api = {
     }
     return response.blob();
   },
+
+  async getCampaignSyncLogs(id: string): Promise<any> {
+    return fetchApi(`/campaign/${id}/sync-logs`, { method: 'GET' });
+  },
 };
 

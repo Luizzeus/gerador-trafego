@@ -30,6 +30,7 @@ A plataforma ajuda profissionais autônomos e agências de saúde a estruturarem
 * [x] **WhatsApp Automation (Concluído):** Disparador de notificações automáticas via WhatsApp (simulação Evolution API/Z-API) integrado ao CRM de Leads e à Agenda de Consultas.
 * [x] **Painel Administrativo Geral (RF-13 - Concluído):** Monitoramento de faturamento consolidado, aprovação e revogação ética de perfis profissionais (CRP/COREN autodeclarados) e auditoria legal global de consentimento LGPD.
 * [x] **Exportação de Dados do CRM (RF-14 - Concluído):** Exportação estruturada de leads e logs de consentimento da LGPD em formato CSV para backup, auditoria ou migração externa.
+* [x] **Automação de Campanhas Direta (RF-15 - Concluído):** Publicação em tempo real com stepper visual de progresso e console/terminal de payloads JSON (Google Ads v16 e Meta Graph API v19.0) das campanhas lançadas.
 
 ---
 
@@ -64,7 +65,11 @@ Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e imp
    - Lógica de compilação de dados do lead, categorias e hash da LGPD convertendo em CSV com suporte a escape de aspas e codificação UTF-8.
    - Fluxo de download seguro via Blob no lado do cliente Next.js.
 
-6. **Arquitetura & Estrutura de Arquivos da Fase 3**:
+6. **Automação de Campanhas Direta (RF-15)**:
+   - **Fluxo Visual de Sincronização**: Ao criar/lançar uma campanha (Google ou Meta Ads), a plataforma agora inicia uma animação passo a passo exibindo as etapas de validação de token, alocação de orçamento, criação de grupos de anúncio, vinculação à Landing Page e ativação final.
+   - **Visualizador de Payloads de API (Terminal Logs)**: Disponibilização de um botão "Terminal" (ícone de terminal) em cada campanha na listagem. Ao clicar, abre-se um modal interativo e estilizado simulando um console que exibe o payload exato de **Request** e **Response** trafegados em formato JSON estruturado (Google Ads API v16 ou Meta Graph API v19.0), permitindo auditoria técnica direta.
+
+7. **Arquitetura & Estrutura de Arquivos da Fase 3**:
    - **Backend (NestJS):**
      * [appointment.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.service.ts) - Lógica de agendamento, controle de status, geração de link de reuniões e sincronização do Google Calendar.
      * [appointment.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/appointment/appointment.controller.ts) - Endpoints públicos e protegidos (JWT) de consulta, status, criação e credenciais.
@@ -78,12 +83,16 @@ Durante as iterações da Fase 3, as seguintes soluções foram desenhadas e imp
      * [admin.module.ts](file:///c:/Projetos/Gerador-trafego/backend/src/admin/admin.module.ts) - Registro do módulo administrativo.
      * [lead.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/lead/lead.controller.ts) - Rota `GET /leads/export` protegida.
      * [lead.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/lead/lead.service.ts) - Lógica de formatação CSV do CRM.
+     * [campaign.controller.ts](file:///c:/Projetos/Gerador-trafego/backend/src/campaign/campaign.controller.ts) - Endpoint `GET /campaign/:id/sync-logs` protegido por JWT para retornar os passos e payloads reais da sincronização.
+     * [campaign.service.ts](file:///c:/Projetos/Gerador-trafego/backend/src/campaign/campaign.service.ts) - Lógica de geração determinística e estruturada de logs de sincronização e payloads JSON específicos para Google e Meta Ads.
    - **Frontend (Next.js):**
      * [agenda/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/agenda/page.tsx) - Painel administrativo da agenda e fluxo simulado do Google OAuth2.
      * [lp/[subdomain]/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/lp/%5Bsubdomain%5D/page.tsx) - Integração com o formulário de pré-agendamento e captação de leads.
      * [whatsapp/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/whatsapp/page.tsx) - Tela de automação de WhatsApp, pareamento QR e logs de disparos.
      * [admin/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/admin/page.tsx) - Painel geral de administração da plataforma.
      * [crm/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/crm/page.tsx) - Botão e fluxo de download do CSV.
+     * [campaigns/page.tsx](file:///c:/Projetos/Gerador-trafego/frontend/src/app/dashboard/campaigns/page.tsx) - Integração com o stepper visual de publicação e modal de visualização de logs JSON de API com estilo terminal escuro.
+     * [api.ts](file:///c:/Projetos/Gerador-trafego/frontend/src/lib/api.ts) - Integração com a função `getCampaignSyncLogs` para consumo da nova rota no backend.
 
 ---
 

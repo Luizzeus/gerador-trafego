@@ -63,4 +63,10 @@ export class CampaignController {
   async deleteCampaign(@Req() req: any, @Param('id') id: string) {
     return this.campaignService.deleteCampaign(req.user.id, id);
   }
+
+  // 8. Obter logs de sincronização da API (Google/Meta Ads)
+  @Get(':id/sync-logs')
+  async getSyncLogs(@Req() req: any, @Param('id') id: string) {
+    return this.campaignService.getCampaignSyncLogs(req.user.id, id);
+  }
 }

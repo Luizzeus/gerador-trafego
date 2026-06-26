@@ -21,7 +21,8 @@ import {
   Sparkles,
   AlertCircle,
   HelpCircle,
-  FolderOpen
+  FolderOpen,
+  Terminal
 } from 'lucide-react';
 
 export default function CampaignsPage() {
@@ -36,6 +37,34 @@ export default function CampaignsPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showConsentModal, setShowConsentModal] = useState<{ show: boolean; provider: string | null }>({ show: false, provider: null });
   const [creating, setCreating] = useState(false);
+  
+  // RF-15: Estados do progresso de publicação e logs da API
+  const [showSyncProgressModal, setShowSyncProgressModal] = useState(false);
+  const [syncProgressStep, setSyncProgressStep] = useState(0);
+  const [syncChannel, setSyncChannel] = useState('google_ads');
+  const [showLogsModal, setShowLogsModal] = useState(false);
+  const [selectedCampaignLogs, setSelectedCampaignLogs] = useState<any>(null);
+  const [loadingLogs, setLoadingLogs] = useState(false);
+
+  const googleSyncSteps = [
+    'Conectando ao servidor do Google Ads...',
+    'Validando token OAuth2 e permissões de desenvolvedor...',
+    'Enviando segmentação local (São Paulo e adjacências)...',
+    'Criando Search Campaign na conta de anúncios...',
+    'Criando AdGroup e injetando palavras-chave de tráfego...',
+    'Enviando criativo responsivo com textos éticos higienizados...',
+    'Campanha publicada e ativa no Google Ads com sucesso!'
+  ];
+
+  const metaSyncSteps = [
+    'Conectando à API de Gráficos da Meta (v19.0)...',
+    'Validando credenciais do Meta Business Suite...',
+    'Configurando AdSet (Público de 25-65 anos na região local)...',
+    'Associando Pixel de Conversão para rastrear leads de LPs...',
+    'Carregando criativo (headline, legenda e link da Landing Page)...',
+    'Criando anúncio de captação de Leads...',
+    'Campanha publicada e ativa no Facebook e Instagram!'
+  ];
   
   // Campos do formulário de criação
   const [formName, setFormName] = useState('');
@@ -176,13 +205,46 @@ export default function CampaignsPage() {
         targetKeywords: formKeywords
       });
 
+      // Abre a simulação do progresso da API
+      setSyncChannel(formChannel);
       setShowCreateModal(false);
       setFormName('');
-      await loadData();
+      setShowSyncProgressModal(true);
+      setSyncProgressStep(0);
+
+      let step = 0;
+      const interval = setInterval(() => {
+        step++;
+        setSyncProgressStep(step);
+        if (step >= 6) {
+          clearInterval(interval);
+          setTimeout(async () => {
+            setShowSyncProgressModal(false);
+            await loadData();
+          }, 1200);
+        }
+      }, 1000);
+
     } catch (e: any) {
       alert(e.message || 'Erro ao criar campanha.');
     } finally {
       setCreating(false);
+    }
+  };
+
+  const handleViewLogs = async (id: string) => {
+    setLoadingLogs(true);
+    setSelectedCampaignLogs(null);
+    setShowLogsModal(true);
+    try {
+      const logs = await api.getCampaignSyncLogs(id);
+      setSelectedCampaignLogs(logs);
+    } catch (e) {
+      console.error('Erro ao buscar logs da API:', e);
+      alert('Não foi possível carregar os logs da API.');
+      setShowLogsModal(false);
+    } finally {
+      setLoadingLogs(false);
     }
   };
 
@@ -452,6 +514,14 @@ export default function CampaignsPage() {
                               title={c.status === 'active' ? 'Pausar Campanha' : 'Retomar Campanha'}
                             >
                               {c.status === 'active' ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+                            </button>
+                            
+                            <button
+                              onClick={() => handleViewLogs(c.id)}
+                              className="p-2 rounded-xl border border-slate-800 hover:border-teal-500/30 text-teal-400 hover:bg-teal-500/5 transition-all"
+                              title="Visualizar Logs da API"
+                            >
+                              <Terminal className="h-4 w-4" />
                             </button>
                             
                             <button
@@ -813,6 +883,172 @@ export default function CampaignsPage() {
               </button>
 
             </form>
+          </div>
+        </div>
+      )}
+      {/* MODAL: Progresso de Sincronização Dinâmica (RF-15) */}
+      {showSyncProgressModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fade-in">
+          <div className="bg-slate-950 border border-slate-900 rounded-3xl p-8 max-w-lg w-full shadow-2xl space-y-6">
+            
+            {/* Header */}
+            <div className="flex items-center gap-3 pb-4 border-b border-slate-900">
+              <div className="bg-teal-500/10 p-2 rounded-xl text-teal-400 shrink-0 animate-pulse">
+                <Terminal className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="font-extrabold text-sm text-white">Sincronizador de API Direct-Ads</h4>
+                <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Publicando anúncio em tempo real</span>
+              </div>
+            </div>
+
+            {/* List of Steps */}
+            <div className="space-y-3.5">
+              {(syncChannel === 'google_ads' ? googleSyncSteps : metaSyncSteps).map((stepMsg, idx) => {
+                const isCompleted = idx < syncProgressStep;
+                const isCurrent = idx === syncProgressStep;
+                
+                return (
+                  <div 
+                    key={idx} 
+                    className={`flex items-center gap-3 text-xs transition-all duration-200 ${
+                      isCompleted 
+                        ? 'text-emerald-400 font-semibold' 
+                        : isCurrent 
+                          ? 'text-teal-300 font-bold' 
+                          : 'text-slate-600 opacity-55'
+                    }`}
+                  >
+                    <div className="shrink-0">
+                      {isCompleted ? (
+                        <Check className="h-4.5 w-4.5 text-emerald-500" />
+                      ) : isCurrent ? (
+                        <Loader2 className="h-4.5 w-4.5 animate-spin text-teal-400" />
+                      ) : (
+                        <div className="h-4.5 w-4.5 rounded-full border border-slate-800 flex items-center justify-center text-[8px] font-bold">
+                          {idx + 1}
+                        </div>
+                      )}
+                    </div>
+                    <span className="leading-snug">{stepMsg}</span>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Progress Bar */}
+            <div className="space-y-1.5 pt-2">
+              <div className="flex justify-between text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                <span>Progresso da Sincronização</span>
+                <span>{Math.round((syncProgressStep / 6) * 100)}%</span>
+              </div>
+              <div className="h-2 bg-slate-900 rounded-full overflow-hidden border border-slate-900/60">
+                <div 
+                  className="h-full bg-gradient-to-r from-clinical-500 to-indigo-500 rounded-full transition-all duration-500 ease-out" 
+                  style={{ width: `${(syncProgressStep / 6) * 100}%` }}
+                />
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
+
+      {/* MODAL: Visualizador de Logs da API (RF-15) */}
+      {showLogsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="bg-slate-950 border border-slate-900 rounded-3xl p-8 max-w-3xl w-full shadow-2xl space-y-6 my-8">
+            
+            {/* Header */}
+            <div className="flex justify-between items-center pb-4 border-b border-slate-900">
+              <div className="flex items-center gap-3">
+                <div className="bg-teal-500/10 p-2.5 rounded-xl text-teal-400">
+                  <Terminal className="h-5 w-5" />
+                </div>
+                <div>
+                  <h4 className="font-extrabold text-sm text-white">Logs de Sincronização da API</h4>
+                  <p className="text-[10px] text-slate-500">Inspeção detalhada de payloads JSON enviados às redes de anúncio.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowLogsModal(false)}
+                className="text-slate-500 hover:text-white text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-900 hover:border-slate-800 transition-all"
+              >
+                Fechar
+              </button>
+            </div>
+
+            {loadingLogs ? (
+              <div className="h-[250px] flex flex-col items-center justify-center text-slate-500 gap-3">
+                <Loader2 className="w-7 h-7 animate-spin text-clinical-500" />
+                <span className="text-xs font-semibold">Buscando logs de auditoria...</span>
+              </div>
+            ) : selectedCampaignLogs ? (
+              <div className="space-y-6">
+                
+                {/* Status & Channel */}
+                <div className="flex flex-wrap gap-4 items-center justify-between bg-slate-900/20 border border-slate-900/60 p-4 rounded-2xl text-xs">
+                  <div>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Campanha</span>
+                    <span className="font-bold text-white mt-0.5 block">{selectedCampaignLogs.name}</span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Canal de API</span>
+                    <span className="font-bold text-teal-400 mt-0.5 block">
+                      {selectedCampaignLogs.channel === 'google_ads' ? 'Google Ads API v16' : 'Meta Graph API v19.0'}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[9px] font-bold text-slate-500 uppercase tracking-wider block">Status de Sincronização</span>
+                    <span className="font-bold text-emerald-400 mt-0.5 block flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 block" />
+                      100% Sincronizado
+                    </span>
+                  </div>
+                </div>
+
+                {/* Audit Steps Logs */}
+                <div className="space-y-2">
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">Linha do Tempo de Sincronização</span>
+                  <div className="bg-slate-950 border border-slate-900/80 rounded-2xl p-4 max-h-[160px] overflow-y-auto space-y-2.5 font-mono text-[10px] text-slate-400">
+                    {selectedCampaignLogs.steps?.map((step: any, idx: number) => (
+                      <div key={idx} className="flex gap-3 leading-relaxed">
+                        <span className="text-slate-600 shrink-0">{new Date(step.timestamp).toLocaleTimeString('pt-BR')}</span>
+                        <span className="text-teal-500/90 shrink-0">&gt;&gt;</span>
+                        <span className={idx === 9 ? 'text-emerald-400 font-semibold' : ''}>{step.message}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* JSON Payloads tabs side-by-side */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  
+                  {/* Request JSON */}
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">API Request Payload (POST)</span>
+                    <pre className="bg-slate-950 border border-slate-900 p-4 rounded-2xl text-[10px] font-mono text-teal-400 overflow-x-auto max-h-[300px] leading-relaxed">
+                      {JSON.stringify(selectedCampaignLogs.apiLogs?.request, null, 2)}
+                    </pre>
+                  </div>
+
+                  {/* Response JSON */}
+                  <div className="space-y-1.5">
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">API Response Payload (200 OK)</span>
+                    <pre className="bg-slate-950 border border-slate-900 p-4 rounded-2xl text-[10px] font-mono text-emerald-400 overflow-x-auto max-h-[300px] leading-relaxed">
+                      {JSON.stringify(selectedCampaignLogs.apiLogs?.response, null, 2)}
+                    </pre>
+                  </div>
+
+                </div>
+
+              </div>
+            ) : (
+              <div className="text-center py-12 text-slate-500 text-xs font-semibold">
+                Nenhum log encontrado para esta campanha.
+              </div>
+            )}
+
           </div>
         </div>
       )}

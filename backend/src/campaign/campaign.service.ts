@@ -259,4 +259,199 @@ export class CampaignService {
       cpc,
     };
   }
+
+  async getCampaignSyncLogs(userId: string, id: string) {
+    const campaign = await this.prisma.campaign.findFirst({
+      where: { id, userId },
+      include: {
+        landingPage: {
+          select: {
+            title: true,
+            subdomain: true,
+          },
+        },
+        adsCredential: {
+          select: {
+            accountId: true,
+            accountName: true,
+          },
+        },
+      },
+    });
+
+    if (!campaign) {
+      throw new NotFoundException('Campanha não encontrada.');
+    }
+
+    const providerName = campaign.channel === 'google_ads' ? 'Google Ads' : 'Meta Ads';
+    const accountId = campaign.adsCredential?.accountId || '123-456-7890';
+    const accountName = campaign.adsCredential?.accountName || `Conta ${providerName}`;
+
+    // Array de mensagens de log cronológicas simulando passos
+    const steps = [
+      {
+        timestamp: new Date(campaign.createdAt.getTime()).toISOString(),
+        message: `[System] Iniciando publicação da campanha '${campaign.name}' no provedor ${providerName}.`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 150).toISOString(),
+        message: `[OAuth2] Recuperando credenciais de acesso para a conta '${accountName}' (${accountId}).`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 300).toISOString(),
+        message: `[OAuth2] Token de acesso validado com sucesso. Escopos verificados para gerenciamento de campanhas.`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 500).toISOString(),
+        message: `[API Sync] Enviando payload de segmentação geográfica. Alvo: São Paulo e região local.`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 750).toISOString(),
+        message: `[API Sync] Solicitando criação da campanha principal (Orçamento diário: R$ ${campaign.budget.toFixed(2)}).`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 1050).toISOString(),
+        message: `[API Sync] Resposta recebida da API de Anúncios. Campanha criada com sucesso no canal.`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 1200).toISOString(),
+        message: `[API Sync] Configurando Ad Group (Grupo de Anúncios) e injeção de palavras-chave locais: [${campaign.targetKeywords || 'Sem palavras-chave'}].`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 1400).toISOString(),
+        message: `[Ethical Guardrail] Higienizando copys promocionais e validando conformidade com as diretrizes do CFP/CFM.`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 1600).toISOString(),
+        message: `[API Sync] Carregando criativos, títulos e copys dos anúncios. URL de destino: https://${campaign.landingPage?.subdomain || 'lp'}.medtraffic.com.br`,
+      },
+      {
+        timestamp: new Date(campaign.createdAt.getTime() + 1900).toISOString(),
+        message: `[System] Sincronização da API concluída com sucesso. Status da Campanha atualizado para ATIVA.`,
+      },
+    ];
+
+    // Payloads JSON de Request e Response correspondentes
+    let requestPayload = {};
+    let responsePayload = {};
+
+    if (campaign.channel === 'google_ads') {
+      requestPayload = {
+        api_version: "v16",
+        endpoint: `https://googleads.googleapis.com/v16/customers/${accountId}/campaigns:mutate`,
+        method: "POST",
+        headers: {
+          Authorization: "Bearer [REDACTED_ACCESS_TOKEN]",
+          "developer-token": "[REDACTED_DEVELOPER_TOKEN]"
+        },
+        payload: {
+          operations: [
+            {
+              create: {
+                name: campaign.name,
+                advertisingChannelType: "SEARCH",
+                status: "ENABLED",
+                manualCpc: {},
+                campaignBudget: `customers/${accountId}/campaignBudgets/budget_id_102`,
+                geoTargetTypeSetting: {
+                  positiveGeoTargetType: "PRESENCE_OR_INTEREST"
+                },
+                networkSettings: {
+                  targetGoogleSearch: true,
+                  targetSearchNetwork: true,
+                  targetContentNetwork: false
+                },
+                urlCustomParameters: [
+                  {
+                    key: "utm_source",
+                    value: "google"
+                  },
+                  {
+                    key: "utm_medium",
+                    value: "cpc"
+                  },
+                  {
+                    key: "utm_campaign",
+                    value: campaign.name.toLowerCase().replace(/\s+/g, "_")
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      };
+
+      responsePayload = {
+        statusCode: 200,
+        headers: {
+          "content-type": "application/json"
+        },
+        body: {
+          results: [
+            {
+              resourceName: `customers/${accountId}/campaigns/${campaign.id.replace(/[^0-9]/g, '').slice(0, 10) || '9876543210'}`
+            }
+          ]
+        }
+      };
+    } else {
+      // Meta Ads
+      requestPayload = {
+        api_version: "v19.0",
+        endpoint: `https://graph.facebook.com/v19.0/act_${accountId.replace(/[^0-9]/g, '') || '987654321'}/campaigns`,
+        method: "POST",
+        headers: {
+          Authorization: "Bearer [REDACTED_ACCESS_TOKEN]"
+        },
+        payload: {
+          name: campaign.name,
+          objective: "OUTCOME_LEADS",
+          status: "ACTIVE",
+          daily_budget: Math.round(campaign.budget * 100), // Em centavos para a Meta API
+          special_ad_categories: ["NONE"],
+          bid_strategy: "LOWEST_COST_WITHOUT_CAP",
+          promoted_object: {
+            pixel_id: "pixel_meta_id_mock_92813",
+            custom_event_type: "LEAD"
+          },
+          targeting: {
+            geo_locations: {
+              countries: ["BR"],
+              regions: [{ key: "482" }] // Região SP / Local
+            },
+            age_min: 25,
+            age_max: 65,
+            genders: [1, 2]
+          },
+          creative: {
+            title: campaign.name,
+            body: "Precisa de ajuda especializada? Oferecemos atendimento ético, acolhedor e com total conformidade. Entre em contato.",
+            object_url: `https://${campaign.landingPage?.subdomain || 'lp'}.medtraffic.com.br`
+          }
+        }
+      };
+
+      responsePayload = {
+        statusCode: 200,
+        headers: {
+          "content-type": "application/json"
+        },
+        body: {
+          id: campaign.id.replace(/[^0-9]/g, '').slice(0, 15) || "2385967451203"
+        }
+      };
+    }
+
+    return {
+      campaignId: campaign.id,
+      name: campaign.name,
+      channel: campaign.channel,
+      status: campaign.status,
+      steps,
+      apiLogs: {
+        request: requestPayload,
+        response: responsePayload
+      }
+    };
+  }
 }
