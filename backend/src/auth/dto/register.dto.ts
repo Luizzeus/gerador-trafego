@@ -13,6 +13,6 @@ export class RegisterDto {
   name: string;
 
   @IsString()
-  @IsIn(['professional', 'company_member'], { message: 'Perfil de usuário inválido' })
+  @IsIn(['professional', 'company_member', 'admin'], { message: 'Perfil de usuário inválido' })
   role: string;
 }

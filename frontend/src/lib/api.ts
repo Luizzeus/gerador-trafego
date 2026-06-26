@@ -223,5 +223,25 @@ export const api = {
   async getWhatsappLogs() {
     return fetchApi('/whatsapp/logs', { method: 'GET' });
   },
+
+  // Administrador
+  async getAdminStats() {
+    return fetchApi('/admin/stats', { method: 'GET' });
+  },
+
+  async getAdminProfiles() {
+    return fetchApi('/admin/profiles', { method: 'GET' });
+  },
+
+  async verifyProfile(id: string, isVerified: boolean) {
+    return fetchApi(`/admin/profiles/${id}/verify`, {
+      method: 'PATCH',
+      body: JSON.stringify({ isVerified }),
+    });
+  },
+
+  async getAdminConsentLogs() {
+    return fetchApi('/admin/consent-logs', { method: 'GET' });
+  },
 };
 

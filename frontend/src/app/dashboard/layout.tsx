@@ -15,7 +15,8 @@ import {
   Sparkles,
   CreditCard,
   Megaphone,
-  Calendar
+  Calendar,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function DashboardLayout({
@@ -28,6 +29,7 @@ export default function DashboardLayout({
   const [loading, setLoading] = useState(true);
   const [userName, setUserName] = useState('');
   const [userRole, setUserRole] = useState('');
+  const [rawRole, setRawRole] = useState('');
   const [whatsappConnected, setWhatsappConnected] = useState(false);
 
   useEffect(() => {
@@ -42,7 +44,14 @@ export default function DashboardLayout({
       try {
         const user = JSON.parse(userJson);
         setUserName(user.name || user.email);
-        setUserRole(user.role === 'professional' ? 'Profissional da Saúde' : 'Clínica / Home Care');
+        setRawRole(user.role);
+        setUserRole(
+          user.role === 'admin' 
+            ? 'Administrador' 
+            : user.role === 'professional' 
+              ? 'Profissional da Saúde' 
+              : 'Clínica / Home Care'
+        );
         setLoading(false);
 
         // Busca status do WhatsApp em segundo plano
@@ -81,6 +90,10 @@ export default function DashboardLayout({
     { name: 'Assinatura e Planos', path: '/dashboard/billing', icon: CreditCard },
     { name: 'Perfil Profissional', path: '/dashboard/profile', icon: UserCircle },
   ];
+
+  if (rawRole === 'admin') {
+    menuItems.push({ name: 'Painel Admin', path: '/dashboard/admin', icon: ShieldCheck });
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex">
@@ -179,6 +192,7 @@ export default function DashboardLayout({
              pathname === '/dashboard/campaigns' ? 'Campanhas de Anúncios' : 
              pathname === '/dashboard/agenda' ? 'Agenda de Consultas' : 
              pathname === '/dashboard/billing' ? 'Assinatura e Planos' : 
+             pathname === '/dashboard/admin' ? 'Painel Admin' : 
              pathname === '/dashboard/profile' ? 'Configuração de Perfil' : 'Painel'}
           </h2>
 

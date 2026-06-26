@@ -11,6 +11,7 @@ import { PaymentModule } from './payment/payment.module';
 import { CampaignModule } from './campaign/campaign.module';
 import { AppointmentModule } from './appointment/appointment.module';
 import { WhatsappModule } from './whatsapp/whatsapp.module';
+import { AdminModule } from './admin/admin.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { WhatsappModule } from './whatsapp/whatsapp.module';
     CampaignModule,
     AppointmentModule,
     WhatsappModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
