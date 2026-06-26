@@ -10,13 +10,35 @@ import {
   Loader2, 
   ShieldCheck, 
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  Download
 } from 'lucide-react';
 
 export default function CRM() {
   const [leads, setLeads] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const blob = await api.exportLeads();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `leads_export_${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error('Erro ao exportar leads:', e);
+      alert('Falha ao exportar leads. Tente novamente.');
+    } finally {
+      setExporting(false);
+    }
+  };
 
   const columns = [
     { key: 'new', title: 'Novo Lead', color: 'border-teal-500 text-teal-400 bg-teal-500/5' },
@@ -73,9 +95,24 @@ export default function CRM() {
     <div className="space-y-6">
       
       {/* Header */}
-      <div>
-        <h3 className="font-bold text-slate-400 text-xs uppercase tracking-wider">Gestão do Funil Comercial (CRM)</h3>
-        <p className="text-xs text-slate-500 mt-1">Acompanhe a jornada de atração de cada lead e inicie o contato direto via WhatsApp.</p>
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <h3 className="font-bold text-slate-400 text-xs uppercase tracking-wider">Gestão do Funil Comercial (CRM)</h3>
+          <p className="text-xs text-slate-500 mt-1">Acompanhe a jornada de atração de cada lead e inicie o contato direto via WhatsApp.</p>
+        </div>
+        
+        <button
+          onClick={handleExport}
+          disabled={exporting || leads.length === 0}
+          className="bg-slate-900/60 hover:bg-slate-800 border border-slate-900 px-5 py-3 rounded-2xl flex items-center gap-2 hover:border-slate-800 transition-all font-bold text-xs uppercase tracking-wider text-slate-300 disabled:opacity-55 disabled:cursor-not-allowed shrink-0"
+        >
+          {exporting ? (
+            <Loader2 className="h-4 w-4 animate-spin text-clinical-500" />
+          ) : (
+            <Download className="h-4 w-4 text-clinical-500" />
+          )}
+          Exportar Leads
+        </button>
       </div>
 
       {/* Kanban Board Container */}

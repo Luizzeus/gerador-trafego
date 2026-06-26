@@ -135,4 +135,54 @@ export class LeadService {
       orderBy: { createdAt: 'desc' },
     });
   }
+
+  async exportToCSV(userId: string): Promise<string> {
+    const leads = await this.findByUser(userId);
+
+    const headers = [
+      'ID',
+      'Nome',
+      'E-mail',
+      'Telefone',
+      'Status',
+      'Origem de Trafego',
+      'Landing Page (Subdominio)',
+      'Landing Page (Titulo)',
+      'Categoria de Servico',
+      'Data de Criacao',
+      'Hash LGPD',
+      'Data Aceite LGPD'
+    ];
+
+    const rows = leads.map(lead => [
+      lead.id,
+      lead.name,
+      lead.email || '',
+      lead.phone,
+      lead.status,
+      lead.trafficSource || '',
+      lead.landingPage?.subdomain || '',
+      lead.landingPage?.title || '',
+      lead.serviceCategory?.name || '',
+      lead.createdAt instanceof Date ? lead.createdAt.toISOString() : new Date(lead.createdAt).toISOString(),
+      lead.consentLogs?.[0]?.consentHash || '',
+      lead.consentLogs?.[0]?.acceptedAt
+        ? (lead.consentLogs[0].acceptedAt instanceof Date 
+            ? lead.consentLogs[0].acceptedAt.toISOString() 
+            : new Date(lead.consentLogs[0].acceptedAt).toISOString())
+        : ''
+    ]);
+
+    const escapeCSV = (val: string) => {
+      const cleanVal = val ? val.replace(/"/g, '""') : '';
+      return `"${cleanVal}"`;
+    };
+
+    const csvContent = [
+      headers.map(escapeCSV).join(','),
+      ...rows.map(row => row.map(val => escapeCSV(String(val))).join(','))
+    ].join('\n');
+
+    return csvContent;
+  }
 }

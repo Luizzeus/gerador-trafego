@@ -1,5 +1,5 @@
-import { Controller, Get, Post, Body, UseGuards, Req, Param, Patch, Ip } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Get, Post, Body, UseGuards, Req, Param, Patch, Ip, Res } from '@nestjs/common';
+import { Request, Response } from 'express';
 import { LeadService } from './lead.service';
 import { CaptureLeadDto } from './dto/capture-lead.dto';
 import { UpdateLeadStatusDto } from './dto/update-lead-status.dto';
@@ -29,6 +29,16 @@ export class LeadController {
   @Get('crm')
   async getMyLeads(@Req() req: any) {
     return this.leadService.findByUser(req.user.id);
+  }
+
+  // Exportar leads em formato CSV (Protegido por JWT)
+  @UseGuards(JwtAuthGuard)
+  @Get('export')
+  async exportLeads(@Req() req: any, @Res() res: Response) {
+    const csvContent = await this.leadService.exportToCSV(req.user.id);
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename=leads_export.csv');
+    return res.send(csvContent);
   }
 
   // Atualizar status de um lead específico no funil do CRM (Protegido por JWT)

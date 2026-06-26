@@ -243,5 +243,24 @@ export const api = {
   async getAdminConsentLogs() {
     return fetchApi('/admin/consent-logs', { method: 'GET' });
   },
+
+  async exportLeads(): Promise<Blob> {
+    let token = null;
+    if (typeof window !== 'undefined') {
+      token = localStorage.getItem('medtraffic_token');
+    }
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    const response = await fetch(`${BASE_URL}/leads/export`, {
+      method: 'GET',
+      headers,
+    });
+    if (!response.ok) {
+      throw new Error('Falha ao exportar leads');
+    }
+    return response.blob();
+  },
 };
 
