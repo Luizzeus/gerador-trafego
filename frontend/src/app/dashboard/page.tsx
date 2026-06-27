@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { 
   Users, 
@@ -85,12 +86,12 @@ export default function Dashboard() {
               </p>
             </div>
           </div>
-          <a
+          <Link
             href="/dashboard/profile"
             className="bg-clinical-500 hover:bg-clinical-600 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg shadow-clinical-500/25 transition-all duration-200"
           >
             Configurar Perfil
-          </a>
+          </Link>
         </div>
       )}
 
@@ -155,9 +156,9 @@ export default function Dashboard() {
           <div>
             <div className="flex items-center justify-between pb-5 border-b border-slate-900 mb-5">
               <h3 className="font-extrabold text-base text-white">Contatos Recentes</h3>
-              <a href="/dashboard/crm" className="text-xs text-clinical-500 font-bold hover:underline">
+              <Link href="/dashboard/crm" className="text-xs text-clinical-500 font-bold hover:underline">
                 Acessar CRM completo
-              </a>
+              </Link>
             </div>
 
             {leadsList.length === 0 ? (

@@ -126,6 +126,10 @@ Durante a iteração da Fase 4, a seguinte solução de auto-ajuda e treinamento
    - **Redefinição no Painel Admin**: Aplicação do mesmo controle visual de alternância nos campos de "Nova Senha" e "Confirmar Nova Senha" dentro do modal de alteração de senha de usuários para administradores.
    - **Design & Responsividade**: Ícones interativos (`Eye` e `EyeOff` da biblioteca `lucide-react`) com hover states estilizados integrados ao tema escuro da plataforma. O espaçamento à direita nos inputs foi ajustado para impedir sobreposição do texto digitado com os ícones de ação.
 
+4. **Correção de Rotas com BasePath em Produção**:
+   - **Substituição de Links Estáticos**: Substituição de tags HTML <a> por componentes `<Link>` do Next.js nos cards de alerta de onboarding, nos cabeçalhos de visualização de Landing Pages e nos botões de configuração de perfil.
+   - **Compatibilidade com BasePath**: A alteração resolveu o problema de erros 404 (Página Não Encontrada) gerados ao navegar a partir de contas recém-criadas no ambiente de produção. O componente `<Link>` injeta dinamicamente o prefixo `/saudelead` configurado nas rotas internas, garantindo a compatibilidade transparente entre os ambientes local e de produção.
+
 ---
 
 ## 🚀 Implementações Recentes (Fase 2)

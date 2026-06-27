@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { 
@@ -166,12 +167,12 @@ export default function LandingPages() {
         <p className="text-xs leading-relaxed">
           Você precisa criar seu perfil profissional antes de gerenciar suas Landing Pages de captura.
         </p>
-        <a
+        <Link
           href="/dashboard/profile"
           className="bg-clinical-500 hover:bg-clinical-600 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-lg transition-all duration-200"
         >
           Configurar Perfil Agora
-        </a>
+        </Link>
       </div>
     );
   }
@@ -224,7 +225,7 @@ export default function LandingPages() {
                       <h4 className="font-extrabold text-base text-white truncate max-w-[200px]">{lp.title}</h4>
                       <div className="text-xs text-slate-500 mt-1 font-semibold flex items-center gap-1">
                         URL: 
-                        <a
+                        <Link
                           href={publicLink}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -232,7 +233,7 @@ export default function LandingPages() {
                         >
                           lp/{lp.subdomain}
                           <ExternalLink className="h-3 w-3" />
-                        </a>
+                        </Link>
                       </div>
                     </div>
 
@@ -282,7 +283,7 @@ export default function LandingPages() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <a
+                    <Link
                       href={publicLink}
                       target="_blank"
                       rel="noopener noreferrer"
@@ -290,7 +291,7 @@ export default function LandingPages() {
                     >
                       <Eye className="h-3.5 w-3.5" />
                       Ver Página
-                    </a>
+                    </Link>
                     <button
                       onClick={() => openEditModal(lp)}
                       className="bg-slate-950 hover:bg-slate-900 border border-slate-800 text-slate-400 hover:text-white text-xs font-semibold px-3 py-2 rounded-xl transition-all duration-200"

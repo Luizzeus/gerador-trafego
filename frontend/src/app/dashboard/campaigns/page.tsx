@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import NextLink from 'next/link';
 import { api } from '@/lib/api';
 import { 
   Megaphone, 
@@ -459,13 +460,13 @@ export default function CampaignsPage() {
                         <td className="py-4 px-4 font-medium text-slate-400">
                           <div className="flex items-center gap-1.5">
                             <Link className="h-3.5 w-3.5 text-slate-600" />
-                            <a
+                            <NextLink
                               href={`/lp/${c.landingPage?.subdomain}`}
                               target="_blank"
                               className="hover:text-teal-400 hover:underline truncate max-w-[120px]"
                             >
                               {c.landingPage?.title}
-                            </a>
+                            </NextLink>
                           </div>
                         </td>
 

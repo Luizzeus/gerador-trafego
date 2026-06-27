@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { api } from '@/lib/api';
 import { 
   Sparkles, 
@@ -59,12 +60,12 @@ export default function ContentSuggestions() {
         <p className="text-xs text-red-400 leading-relaxed bg-red-500/5 border border-red-500/10 px-4 py-3 rounded-xl w-full">
           {error}
         </p>
-        <a
+        <Link
           href="/dashboard/profile"
           className="bg-clinical-500 hover:bg-clinical-600 text-white text-xs font-bold px-5 py-3 rounded-xl shadow-lg transition-all duration-200"
         >
           Configurar Meu Perfil
-        </a>
+        </Link>
       </div>
     );
   }
