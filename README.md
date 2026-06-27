@@ -121,6 +121,11 @@ Durante a iteração da Fase 4, a seguinte solução de auto-ajuda e treinamento
    - **Seção Como Funciona (`#processos`)**: Apresentação de uma linha do tempo sequencial e interativa detalhando o fluxo completo do sistema, com links rápidos de navegação.
    - **Simulador de Vídeo Interativo (DemoModal)**: Modal do tipo player que exibe uma demonstração autônoma animada da plataforma MedTraffic rodando em 4 etapas (edição de LP, higienização ética de IA, pareamento do WhatsApp e monitoramento de CRM com Google Meet), incluindo botões de Play/Pause, velocidade, mute e timeline clicável.
 
+3. **Visualização de Senha (Show/Hide Password)**:
+   - **Campos de Senha no Login e Cadastro**: Adicionado controle visual de visualização/ocultação de senha (ícone de olho com alternância dinâmica) para melhorar a experiência do usuário durante o acesso e criação de contas.
+   - **Redefinição no Painel Admin**: Aplicação do mesmo controle visual de alternância nos campos de "Nova Senha" e "Confirmar Nova Senha" dentro do modal de alteração de senha de usuários para administradores.
+   - **Design & Responsividade**: Ícones interativos (`Eye` e `EyeOff` da biblioteca `lucide-react`) com hover states estilizados integrados ao tema escuro da plataforma. O espaçamento à direita nos inputs foi ajustado para impedir sobreposição do texto digitado com os ícones de ação.
+
 ---
 
 ## 🚀 Implementações Recentes (Fase 2)

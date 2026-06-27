@@ -20,7 +20,9 @@ import {
   UserCheck, 
   UserX,
   FileSpreadsheet,
-  X
+  X,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface StatsData {
@@ -111,6 +113,8 @@ export default function AdminDashboard() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [updatingPassword, setUpdatingPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // UI States
   const [actionSuccess, setActionSuccess] = useState('');
@@ -267,6 +271,8 @@ export default function AdminDashboard() {
       setShowPasswordModal(false);
       setNewPassword('');
       setConfirmPassword('');
+      setShowNewPassword(false);
+      setShowConfirmPassword(false);
       setTimeout(() => setActionSuccess(''), 4000);
     } catch (err: any) {
       setActionError(err.message || 'Falha ao redefinir senha do usuário.');
@@ -880,7 +886,13 @@ export default function AdminDashboard() {
             <div className="flex items-center justify-between pb-2 border-b border-slate-855">
               <h3 className="font-extrabold text-sm text-white">Alterar Senha do Usuário</h3>
               <button 
-                onClick={() => { setShowPasswordModal(false); setNewPassword(''); setConfirmPassword(''); }}
+                onClick={() => { 
+                  setShowPasswordModal(false); 
+                  setNewPassword(''); 
+                  setConfirmPassword(''); 
+                  setShowNewPassword(false); 
+                  setShowConfirmPassword(false); 
+                }}
                 className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800"
               >
                 <X className="w-5 h-5" />
@@ -897,28 +909,54 @@ export default function AdminDashboard() {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                   Nova Senha (Mínimo 6 caracteres)
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={newPassword}
-                  onChange={(e) => setNewPassword(e.target.value)}
-                  placeholder="Digite a nova senha"
-                  className="w-full bg-slate-950/85 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
-                />
+                <div className="relative">
+                  <input
+                    type={showNewPassword ? 'text' : 'password'}
+                    required
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Digite a nova senha"
+                    className="w-full bg-slate-950/85 border border-slate-800 rounded-xl pl-4 pr-12 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-300 transition-colors"
+                  >
+                    {showNewPassword ? (
+                      <EyeOff className="h-4.5 w-4.5" />
+                    ) : (
+                      <Eye className="h-4.5 w-4.5" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <div>
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                   Confirmar Nova Senha
                 </label>
-                <input
-                  type="password"
-                  required
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Confirme a nova senha"
-                  className="w-full bg-slate-950/85 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
-                />
+                <div className="relative">
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirme a nova senha"
+                    className="w-full bg-slate-950/85 border border-slate-800 rounded-xl pl-4 pr-12 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-300 transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4.5 w-4.5" />
+                    ) : (
+                      <Eye className="h-4.5 w-4.5" />
+                    )}
+                  </button>
+                </div>
               </div>
 
               <button

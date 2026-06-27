@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Activity, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { Activity, ShieldCheck, ArrowRight, Loader2, Eye, EyeOff } from 'lucide-react';
 import { api } from '@/lib/api';
 
 export default function Register() {
@@ -14,6 +14,7 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -109,14 +110,27 @@ export default function Register() {
             <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Crie uma Senha
             </label>
-            <input
-              type="password"
-              required
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="No mínimo 6 caracteres"
-              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="No mínimo 6 caracteres"
+                className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-4 pr-12 py-3 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-clinical-500 transition-colors"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3.5 top-3.5 text-slate-500 hover:text-slate-300 transition-colors"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-4.5 w-4.5" />
+                ) : (
+                  <Eye className="h-4.5 w-4.5" />
+                )}
+              </button>
+            </div>
           </div>
 
           <div>
